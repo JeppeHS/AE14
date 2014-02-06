@@ -1,0 +1,34 @@
+% Chapter 1
+
+\chapter{Binary Search} % Main chapter title
+
+\label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1} 
+
+\lhead{Chapter 1. \emph{Binary Search}} % This is for the header on each page - perhaps a shortened title
+
+%----------------------------------------------------------------------------------------
+
+\section{Introduction}
+
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/example.eps}
+		\rule{35em}{0.5pt}
+	\caption[example]{
+	Bla bla bla.
+	}
+	\label{fig:example}
+\end{figure}
+
+
+\begin{itemize} 
+\item Linear search
+\item Inorder
+\item BFS
+\item DFS
+\item vEB
+\end{itemize}
+
+
+In \citep{someArticle} it is mentioned that...
