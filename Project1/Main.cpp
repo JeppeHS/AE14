@@ -29,10 +29,11 @@ int main(int argc, char **argv)
 		high = 100;
 		low = 0;
 		int array [size];
-		
 		fillArrayWithRandom(array, size, low, high, i+1);
+		
 		searchFor = getRandomNumber(low, high, i+1);	
 		
+		// Perform experiments
 		experimentLinearSearch(array, searchFor);
 		experimentBasicAlgorithm(array, searchFor);
 		experimentBFS(array, searchFor);
@@ -90,7 +91,7 @@ void experimentVEB(int * array, int elem) {
 	// Do stuff here
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endTime);
 	timeDiff = endTime.tv_nsec - startTime.tv_nsec;
-	cout<< "VEN took " << timeDiff << " ns" << endl;
+	cout<< "VEB took " << timeDiff << " ns" << endl;
 }
 
 int getRandomNumber(int low, int high, int seed) {
