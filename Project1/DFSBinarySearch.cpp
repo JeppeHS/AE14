@@ -4,26 +4,35 @@
 
 using namespace std;
 
-int dfsArr;
+int * dfsArr;
 
 DFSBinarySearch::DFSBinarySearch() {
 }
 
 DFSBinarySearch::~DFSBinarySearch() {
+	delete [] dfsArr;
 }
 
 void DFSBinarySearch::createDataStructure(int * arr, int arrSize) 
-{
-	//TEST
-	cout << "Size of input arr " << arrSize << endl;
-	cout << "Last element " << arr[arrSize-1] << endl; 
-	
+{	
+	dfsArr = new int[arrSize];
+
+
+
+
+
+
+	for (int i = 0; i < arrSize; i++) {
+		cout << "dfsArr i " << i << " , val " << dfsArr[i] << endl;
+	}
 	
 	
 }
 
 int DFSBinarySearch::binSearch(int elem) 
 {
+	
+	
 	
 	return 1;
 }

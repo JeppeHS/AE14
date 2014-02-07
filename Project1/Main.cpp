@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <time.h>
+#include <algorithm>
 
 #include "DFSBinarySearch.h"
 
@@ -28,17 +29,19 @@ int main(int argc, char **argv)
 {
 	dfs = DFSBinarySearch();
 	
-	int size, low, high, searchFor;
+	int arrSize, low, high, searchFor;
 	for (int i = 0; i < NUM_EXPERIMENTS; i++) {
 		// Create random array
-		size = 10;
+		arrSize = 10;
 		high = 100;
 		low = 0;
-		int array [size];
-		fillArrayWithRandom(array, size, low, high, i+1);
+		int array [arrSize];
+		fillArrayWithRandom(array, arrSize, low, high, i+1);
+		// Sort array
+		sort(array, array + arrSize);
 		
 		// Set up algorithms
-		dfs.createDataStructure(array, size);
+		dfs.createDataStructure(array, arrSize);
 		
 		// Repeat experiments
 		for (int j = 0; j < RUN_TIMES; j++) {
@@ -98,13 +101,13 @@ void experimentVEB(int elem) {
 }
 
 int getRandomNumber(int low, int high, int seed) {
-	srand(seed);
+	srand(seed + (unsigned) time(0));
 	return rand() % ( (high+1) - low ) + low;
 }
 
 void fillArrayWithRandom(int * array, int size, int low, int high, int seed)
 {
-	srand(seed);
+	srand(seed + (unsigned) time(0));
     for(int i=0; i<size; i++){ 
         array[i] = rand() % ( (high+1) - low ) + low;
         cout << array[i] << endl; 
