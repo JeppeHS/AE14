@@ -13,3 +13,5 @@
 *.a
 
 *.out
+*.gch
+geany_run_script.sh
