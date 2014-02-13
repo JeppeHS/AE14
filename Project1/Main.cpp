@@ -12,6 +12,7 @@
 #include <sys/ioctl.h>
 #include <linux/perf_event.h>
 #include <asm/unistd.h>
+#include <climits>
 
 #include "BinSearchInterface.h"
 #include "BFSBinarySearch.h"
@@ -96,7 +97,7 @@ int main(int argc, char **argv)
 		
 		// Repeat experiments
 		for (int j = 0; j < RUN_TIMES; j++) {
-			searchFor = getRandomNumber(low, high, j+1);	
+			searchFor = getRandomNumber(low, high, INT_MAX - j);	
 		
 			
 			

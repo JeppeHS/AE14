@@ -1,7 +1,6 @@
 #include <cmath>
 #include <iostream>
 #include "DFSBinarySearch.h"
-#include <queue>
 
 using namespace std;
 
@@ -16,7 +15,6 @@ DFSBinarySearch::DFSBinarySearch() {
 }
 
 DFSBinarySearch::~DFSBinarySearch() {
-	delete [] dfsArr;
 }
 
 void DFSBinarySearch::createDataStructure(int * arr, int arrSize) 
