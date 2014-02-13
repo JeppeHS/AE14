@@ -71,7 +71,7 @@ int main(int argc, char **argv)
   {int i; for (i=0; i<nAlgos; i++) {
       files[i] = fopen(algo_labels[i], "w");
       int j; for (j=0; j<nStats; j++) {
-	fprintf(files[i], "%s,", conf_labels[i]);
+	fprintf(files[j], "%s,", conf_labels[j]);
       }
       fprintf(files[i], "\n");
     }}
