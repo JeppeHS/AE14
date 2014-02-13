@@ -17,10 +17,11 @@
 #include "BinSearchInterface.h"
 #include "BFSBinarySearch.h"
 #include "DFSBinarySearch.h"
+#include "BinarySearch.h"
 
 using namespace std;
 
-const int NUM_EXPERIMENTS = 1;
+const int NUM_EXPERIMENTS = 2;
 const int RUN_TIMES = 1;
 
 timespec startTime, endTime;
@@ -45,15 +46,16 @@ void perf_event_enable(int fd_array[], int nStats);
 void perf_event_disable(int fd_array[], int nStats);
 void read_all(FILE *file, int* fd_array, int nStats);
 
-const int nAlgos = 2;
-const char *algo_labels[nAlgos] = {"BFS.csv", "DFS.csv"};
+const int nAlgos = 3;
+const char *algo_labels[nAlgos] = {"BFS.csv", "DFS.csv", "Inorder.csv"};
 
 
 int main(int argc, char **argv)
 {
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
-  BinSearchInterface *algo_array[nAlgos] = {&bfs, &dfs};
+  BinarySearch inorder = BinarySearch();
+  BinSearchInterface *algo_array[nAlgos] = {&bfs, &dfs, &inorder};
   
 
   int conf_array[] = {PERF_COUNT_HW_BRANCH_MISSES,
@@ -71,7 +73,7 @@ int main(int argc, char **argv)
   {int i; for (i=0; i<nAlgos; i++) {
       files[i] = fopen(algo_labels[i], "w");
       int j; for (j=0; j<nStats; j++) {
-	fprintf(files[j], "%s,", conf_labels[j]);
+	fprintf(files[i], "%s,", conf_labels[j]);
       }
       fprintf(files[i], "\n");
     }}
@@ -83,7 +85,7 @@ int main(int argc, char **argv)
 		high = 100;
 		low = 0;
 		int array [arrSize];
-		fillArrayWithRandom(array, arrSize, low, high, i+1);
+		fillArrayWithRandom(array, arrSize*(i+1), low, high, i+1);
 		// Sort array
 		sort(array, array + arrSize);
 		
@@ -103,6 +105,7 @@ int main(int argc, char **argv)
 			    perf_event_reset(fd_array, nStats);
 			    perf_event_enable(fd_array, nStats);
 			    (*algo_array[iAlg]).binSearch(searchFor);
+			    printf("iAlg=%d done", iAlg);
 			    perf_event_disable(fd_array, nStats);
 			    read_all(files[iAlg], fd_array, nStats);
 			  }}
