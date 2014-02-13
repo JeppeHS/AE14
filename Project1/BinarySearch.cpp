@@ -2,9 +2,7 @@
 #include "BinarySearch.h"
 
 int size;
-int linIndex;
 int * binaryArray;
-int * linArray;
 
 using namespace std;
 
@@ -13,67 +11,49 @@ BinarySearch::BinarySearch() {
 }
 
 BinarySearch::~BinarySearch() {
-	delete [] binaryArray;
+	//delete [] binaryArray;
 }
 
 void BinarySearch::createDataStructure(int * arr, int arrSize) 
 {	
-	binaryArray = new int[arrSize];
-
+	binaryArray = arr;
+	
 
 	size = arrSize;
-    linArray = arr;
-
-    //remove_this printing stuff
-    {int i;
-    for (i=0;i<size;i++) {
-      cout << linArray[i] << "\t";
-    }}
-    cout << "\n";
-    
-    linIndex = 0;
-    insert(0);
-
-
-
-	for (int i = 0; i < arrSize; i++) {
-		cout << "binaryArray i " << i << " , val " << binaryArray[i] << endl;
-	}
-	
 	
 }
 
 int BinarySearch::binSearch(int elem) 
-{	
-	int i = 0;
-    int curr = binaryArray[i]; // The current node visited
-    int res = 0; // The latest element smaller than 'elem'.
+{
+	
+	int low = 0;
+	int high = size-1;
+	int current  = (high + low)/2;;
+    int curr = binaryArray[current]; // The current node visited
     while (curr != elem){
-     cout << "curr="<<curr<<", i="<<i<<"\n"; //remove_this
-      i = 2*i+1; // Left child
-      if (curr < elem){
-	i++; // Right child (=left+1)
-	res = curr; // This is now the latest known element smaller than 'elem'.
+		current = (high + low)/2;
+      if (curr > elem && high > low){
+		high = current -1;
+		curr = binaryArray[current];
 	   }
+	  else if(curr < elem && high != low){
+		  low = current +1;
+	  }
+	  else if(high == low){
+		  current = high +1;
+		  int result = binaryArray[current];
+		  return result;
+	  }
 
       // If we have reached a bottom node, return the last element lower than 'elem'.
-      if (i >= size){
-	cout << "i>=size: "<<i<<">="<<size<<"\n"; //remove_this
-	return res;
+      if (high >= size){
+	cout << "i>=size: "<<high<<">="<<size<<"\n"; //remove_this
+	return binaryArray[current];
       }
 
-      curr = binaryArray[i];
+      curr = binaryArray[current];
     }
 
     // At this point, the while loop did not continue because curr==elem
     return curr;
-}
-
-void BinarySearch::insert(int binIndex)
-{
-	if (binIndex >= size) return;
-    insert(2*binIndex+1); // Left child
-    binaryArray[binIndex] = *(linArray+linIndex);
-    linIndex++;
-    insert(2*binIndex+2); // Right child
 }
