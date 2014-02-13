@@ -21,7 +21,7 @@
 
 using namespace std;
 
-const int NUM_EXPERIMENTS = 2;
+const int NUM_EXPERIMENTS = 10;
 const int RUN_TIMES = 1;
 
 timespec startTime, endTime;
@@ -46,8 +46,8 @@ void perf_event_enable(int fd_array[], int nStats);
 void perf_event_disable(int fd_array[], int nStats);
 void read_all(FILE *file, int* fd_array, int nStats);
 
-const int nAlgos = 3;
-const char *algo_labels[nAlgos] = {"BFS.csv", "DFS.csv", "Inorder.csv"};
+const int nAlgos = 1;
+const char *algo_labels[nAlgos] = {"BFS.csv"};
 
 
 int main(int argc, char **argv)
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
   BinarySearch inorder = BinarySearch();
-  BinSearchInterface *algo_array[nAlgos] = {&bfs, &dfs, &inorder};
+  BinSearchInterface *algo_array[nAlgos] = {&bfs};
   
 
   int conf_array[] = {PERF_COUNT_HW_BRANCH_MISSES,
@@ -69,6 +69,7 @@ int main(int argc, char **argv)
   //int nRuns = 1;
   //  long long stats[nRuns][nStats];
 	
+
   FILE *files[nAlgos];
   {int i; for (i=0; i<nAlgos; i++) {
       files[i] = fopen(algo_labels[i], "w");
@@ -80,18 +81,20 @@ int main(int argc, char **argv)
 
 	int arrSize, low, high, searchFor;
 	for (int i = 0; i < NUM_EXPERIMENTS; i++) {
+		cout << "Experiment " << i << endl;
+		
 		// Create random array
-		arrSize = 10;
+		arrSize = i+1;
 		high = 100;
 		low = 0;
-		int array [arrSize];
-		fillArrayWithRandom(array, arrSize*(i+1), low, high, i+1);
+		int array[arrSize];
+		fillArrayWithRandom(array, arrSize, low, high, i+1);
 		// Sort array
-		sort(array, array + arrSize);
+		//sort(array, array + arrSize);
 		
 		// Set up algorithms
 		{int i;
-		 for (i=0; i<nAlgos; i++){
+		 for (i=0; i<nAlgos; i++) {
 		   (*algo_array[i]).createDataStructure(array, arrSize);
 		 }}
 		
@@ -124,10 +127,9 @@ int getRandomNumber(int low, int high, int seed) {
 void fillArrayWithRandom(int * array, int size, int low, int high, int seed)
 {
 	srand(seed + (unsigned) time(0));
-    for(int i=0; i<size; i++){ 
+    for(int i=0; i < size; i++){ 
         array[i] = rand() % ( (high+1) - low ) + low;
-        cout << array[i] << endl; 
-	}     
+	} 
 }
 
 /*
