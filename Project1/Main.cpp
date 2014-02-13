@@ -73,6 +73,7 @@ int main(int argc, char **argv)
   FILE *files[nAlgos];
   {int i; for (i=0; i<nAlgos; i++) {
       files[i] = fopen(algo_labels[i], "w");
+      fprintf(files[i], "Array size,");
       int j; for (j=0; j<nStats; j++) {
 	fprintf(files[i], "%s,", conf_labels[j]);
       }
@@ -90,7 +91,7 @@ int main(int argc, char **argv)
 		int array[arrSize];
 		fillArrayWithRandom(array, arrSize, low, high, i+1);
 		// Sort array
-		//sort(array, array + arrSize);
+		sort(array, array + arrSize);
 		
 		// Set up algorithms
 		{int i;
@@ -110,6 +111,8 @@ int main(int argc, char **argv)
 			    (*algo_array[iAlg]).binSearch(searchFor);
 			    printf("iAlg=%d done", iAlg);
 			    perf_event_disable(fd_array, nStats);
+			    {int iAlg; for (iAlg=0; iAlg<nAlgos; iAlg++) {
+			    	fprintf(files[iAlg], "%d,",arrSize);}}
 			    read_all(files[iAlg], fd_array, nStats);
 			  }}
 		}
