@@ -27,13 +27,7 @@ void DFSBinarySearch::createDataStructure(int * arr, int arrSize)
 	int root = floor(arrSize/2);
 	int depth = 0;
 	dfsInsertAt = 0;
-	dfsInsert(root, arr, dfsArr, depth);
-	
-	// TEST
-	for (int i = 0; i < arrSize; i++) {
-		cout << "dfsArr i " << i << " , val " << dfsArr[i] << endl;
-	}
-	
+	dfsInsert(root, arr, dfsArr, depth);	
 }
 
 void dfsInsert(int node, int * inputArr, int * outputArr, int atDepth) {
