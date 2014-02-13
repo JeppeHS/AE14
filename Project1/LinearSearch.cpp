@@ -37,8 +37,7 @@ int LinearSearch::linSearch(int elem)
 
       // If we have reached a bottom node, return the last element lower than 'elem'.
       if (current >= linSize){
-	cout << "i>=size: "<<current<<">="<<linSize<<"\n"; //remove_this
-	return linearArray[current];
+		return linearArray[current-1];
       }
 
       curr = linearArray[current];
