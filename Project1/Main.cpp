@@ -16,7 +16,7 @@
 
 #include "BinSearchInterface.h"
 #include "BFSBinarySearch.h"
-//#include "DFSBinarySearch.h"
+#include "DFSBinarySearch.h"
 
 using namespace std;
 
@@ -45,13 +45,15 @@ void perf_event_enable(int fd_array[], int nStats);
 void perf_event_disable(int fd_array[], int nStats);
 void read_all(FILE *file, int* fd_array, int nStats);
 
-const int nAlgos = 1;
-const char *algo_labels[nAlgos] = {"BFS.csv"};
+const int nAlgos = 2;
+const char *algo_labels[nAlgos] = {"BFS.csv", "DFS.csv"};
+
 
 int main(int argc, char **argv)
 {
   BFSBinarySearch bfs = BFSBinarySearch();
-  BinSearchInterface *algo_array[nAlgos] = {&bfs};
+  DFSBinarySearch dfs = DFSBinarySearch();
+  BinSearchInterface *algo_array[nAlgos] = {&bfs, &dfs};
   
 
   int conf_array[] = {PERF_COUNT_HW_BRANCH_MISSES,
@@ -64,14 +66,12 @@ int main(int argc, char **argv)
 
   //int nRuns = 1;
   //  long long stats[nRuns][nStats];
-
-  //dfs = DFSBinarySearch();
 	
   FILE *files[nAlgos];
   {int i; for (i=0; i<nAlgos; i++) {
       files[i] = fopen(algo_labels[i], "w");
       int j; for (j=0; j<nStats; j++) {
-	fprintf(files[i], "%s,", conf_labels[i]);
+	fprintf(files[j], "%s,", conf_labels[j]);
       }
       fprintf(files[i], "\n");
     }}
@@ -93,13 +93,9 @@ int main(int argc, char **argv)
 		   (*algo_array[i]).createDataStructure(array, arrSize);
 		 }}
 		
-		//dfs.createDataStructure(array, arrSize);
-		
 		// Repeat experiments
 		for (int j = 0; j < RUN_TIMES; j++) {
 			searchFor = getRandomNumber(low, high, INT_MAX - j);	
-		
-			
 			
 			// Perform experiments
 			{int iAlg;
@@ -110,59 +106,13 @@ int main(int argc, char **argv)
 			    perf_event_disable(fd_array, nStats);
 			    read_all(files[iAlg], fd_array, nStats);
 			  }}
-			//experimentLinearSearch(searchFor);
-			//experimentBasicAlgorithm(searchFor);
-			//experimentBFS(searchFor);
-			//			experimentDFS(searchFor);
-			//experimentVEB(searchFor);
 		}
 	}
 	
 	// TODO: Perhaps close the fd_array and files...
 	return 0;
 }
-/*
-void experimentLinearSearch(int elem) {
- 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startTime);
-	// Do stuff here
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endTime);
-	timeDiff = endTime.tv_nsec - startTime.tv_nsec;
-	cout<< "Linear search took " << timeDiff << " ns" << endl;
-}
 
-void experimentBasicAlgorithm(int elem) {
- 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startTime);
-	// Do stuff here
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endTime);
-	timeDiff = endTime.tv_nsec - startTime.tv_nsec;
-	cout<< "Basic algorithm took " << timeDiff << " ns" << endl;
-}
-
-void experimentBFS(int elem) {
- 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startTime);
-	// Do stuff here
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endTime);
-	timeDiff = endTime.tv_nsec - startTime.tv_nsec;
-	cout<< "BFS took " << timeDiff << " ns" << endl;
-}
-
-void experimentDFS(int elem) {
- 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startTime);
-	// Do stuff here
-	int result = dfs.binSearch(elem);
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endTime);
-	timeDiff = endTime.tv_nsec - startTime.tv_nsec;
-	cout<< "DFS took " << timeDiff << " ns, result " << result << endl;
-}
-
-void experimentVEB(int elem) {
- 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startTime);
-	// Do stuff here
-	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endTime);
-	timeDiff = endTime.tv_nsec - startTime.tv_nsec;
-	cout<< "VEB took " << timeDiff << " ns" << endl;
-}
-*/
 int getRandomNumber(int low, int high, int seed) {
 	srand(seed + (unsigned) time(0));
 	return rand() % ( (high+1) - low ) + low;
