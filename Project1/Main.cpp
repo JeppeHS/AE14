@@ -18,15 +18,15 @@
 #include "BFSBinarySearch.h"
 #include "DFSBinarySearch.h"
 #include "BinarySearch.h"
+#include "vEBBinarySearch.h"
 
 using namespace std;
 
-const int NUM_EXPERIMENTS = 10;
+const int NUM_EXPERIMENTS = 50;
 const int RUN_TIMES = 5;
 
 timespec startTime, endTime;
 double timeDiff;
-//DFSBinarySearch dfs;
 
 int getRandomNumber(int low, int high, int seed);
 void fillArrayWithRandom(int * array, int size, int low, int high, int seed);
@@ -46,50 +46,62 @@ void perf_event_enable(int fd_array[], int nStats);
 void perf_event_disable(int fd_array[], int nStats);
 void read_all(long long stat_row[], int* fd_array, int nStats);
 
-const int nAlgos = 1;
-const char *algo_labels[nAlgos] = {"BFS.csv"};
-
+const int nAlgos = 2;
+const char *algo_labels[nAlgos] = {"BFS", "DFS"};
+const string output_dir = "Measurements";
 
 int main(int argc, char **argv)
 {
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
   BinarySearch inorder = BinarySearch();
-  BinSearchInterface *algo_array[nAlgos] = {&bfs};
+  vEBBinarySearch veb = vEBBinarySearch();
+  BinSearchInterface *algo_array[nAlgos] = {&bfs, &dfs};
   
 
   int conf_array[] = {PERF_COUNT_HW_BRANCH_MISSES,
 		      PERF_COUNT_HW_INSTRUCTIONS,
-		      PERF_COUNT_SW_TASK_CLOCK};
-  int type_array[] = {PERF_TYPE_HARDWARE,
-		      PERF_TYPE_HARDWARE,
-		      PERF_TYPE_SOFTWARE};
+		      PERF_COUNT_SW_TASK_CLOCK,
+		      PERF_COUNT_SW_CPU_CLOCK,
+		      PERF_COUNT_HW_CACHE_REFERENCES,
+		      PERF_COUNT_HW_CACHE_MISSES};
+  int HW = PERF_TYPE_HARDWARE;
+  int SW = PERF_TYPE_SOFTWARE;
+  int type_array[] = {HW,
+		      HW,
+		      SW,
+		      SW,
+		      HW,
+		      HW};
   const int nStats = sizeof(conf_array)/sizeof(int);
-  const char *conf_labels[nStats] = {"Branch misses",
-				     "Instructions",
-				     "Task clock"};
+  const string conf_labels[nStats] = {"Branch misses",
+				      "Instructions",
+				      "Task clock",
+				      "CPU clock",
+				      "Cache refs",
+				      "Cache misses"};
   int fd_array[nStats];
   perf_event_array(conf_array, type_array, fd_array, nStats);
 
   long long stat_array[nAlgos][RUN_TIMES][nStats];
 	
 
-  FILE *files[nAlgos];
-  {int i; for (i=0; i<nAlgos; i++) {
-      files[i] = fopen(algo_labels[i], "w");
+  FILE *files[nStats];
+  {int i; for (i=0; i<nStats; i++) {
+      files[i] = fopen((output_dir + "/" + conf_labels[i]).c_str(), "w");
       fprintf(files[i], "Array size,");
-      int j; for (j=0; j<nStats; j++) {
-	fprintf(files[i], "%s,", conf_labels[j]);
+      int j; for (j=0; j<nAlgos; j++) {
+	fprintf(files[i], "%s,", algo_labels[j]);
       }
       fprintf(files[i], "\n");
     }}
 
 	int arrSize, low, high, searchFor;
 	for (int i = 0; i < NUM_EXPERIMENTS; i++) {
-		cout << "Experiment " << i << endl;
+	  //cout << "Experiment " << i << endl;
 		
 		// Create random array
-		arrSize = i+1;
+		arrSize = 100*i+1;
 		high = 100;
 		low = 0;
 		int array[arrSize];
@@ -119,26 +131,25 @@ int main(int argc, char **argv)
 
 			    // Stop all the stat-counters:
 			    perf_event_disable(fd_array, nStats);
-			    printf("iAlg=%d done", iAlg); // TODO: remove print
+			    //printf("iAlg=%d done", iAlg); // TODO: remove print
 			    // Store the stats in the stat_array
 			    read_all(stat_array[iAlg][j], fd_array, nStats);
 			  }}
 		}
 
 		// Loop through all the implementations and calculate the average of every stat for searches with this array size.
-		{int iAlg;
-		  for (iAlg=0; iAlg<nAlgos; iAlg++){
-		    fprintf(files[iAlg], "%d,",arrSize);
-		    for (int iStat = 0; iStat<nStats; iStat++){
+		{for (int iStat = 0; iStat<nStats; iStat++){
+		    fprintf(files[iStat], "%d,",arrSize);
+		    for (int iAlg=0; iAlg<nAlgos; iAlg++){
 		      long long stat_sum = 0;
 		      for (int j=0; j<RUN_TIMES; j++){
 			stat_sum += stat_array[iAlg][j][iStat];
-			cout << stat_sum << endl;
+			//cout << stat_sum << endl;
 		      }
 		      long long stat_avg = stat_sum / RUN_TIMES;
-		      fprintf(files[iAlg], "%lld,", stat_avg);
+		      fprintf(files[iStat], "%lld,", stat_avg);
 		    }
-			fprintf(files[iAlg], "\n");
+			fprintf(files[iStat], "\n");
 		  }}
 	}
 	
