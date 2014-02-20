@@ -48,8 +48,8 @@ void perf_event_enable(int fd_array[], int nStats);
 void perf_event_disable(int fd_array[], int nStats);
 void read_all(long long stat_row[], int* fd_array, int nStats);
 
-const int nAlgos = 3;
-const char *algo_labels[nAlgos] = {"Linear search", "BFS", "DFS"};
+const int nAlgos = 4;
+const char *algo_labels[nAlgos] = {"Linear search", "Inorder", "BFS", "DFS"};
 const string output_dir = "Measurements";
 
 int main(int argc, char **argv)
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
   //vEBBinarySearch veb = vEBBinarySearch();
-  BinSearchInterface *algo_array[nAlgos] = {&ls, &bfs, &dfs};
+  BinSearchInterface *algo_array[nAlgos] = {&ls, &inorder, &bfs, &dfs};
   
 
   int conf_array[] = {PERF_COUNT_HW_BRANCH_MISSES,
@@ -143,8 +143,15 @@ int main(int argc, char **argv)
 			    
 			    // Check result
 			    if (oldRes != -1 && oldRes != newRes) {
-					printf("Wrong result. prev-alg:%s, this-alg:%s ArrSize %d, searchFor %d\n", 
-						algo_labels[iAlg-1], algo_labels[iAlg], arrSize, searchFor); 			
+					printf("Wrong result. prev:%s %d, new:%s %d, ArrSize %d, searchFor %d\n", 
+						algo_labels[iAlg-1], oldRes, algo_labels[iAlg], newRes, arrSize, searchFor); 
+					
+					printf("Arr: [");
+					for (int k=0; k < arrSize; k++) {
+						printf("%d,", array[k]);
+					}
+					printf("]\n");
+									
 				}
 				oldRes = newRes;
 			    
