@@ -16,4 +16,6 @@
 *.gch
 *.csv
 geany_run_script.sh
+data/
+*/plot/out/
 
