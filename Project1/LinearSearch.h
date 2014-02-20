@@ -1,14 +1,14 @@
 #ifndef LinearSearch_H
 #define LinearSearch_H
 
-#include "ILinearSearch.h"
-class LinearSearch : public ILinearSearch
+#include "BinSearchInterface.h"
+class LinearSearch : public BinSearchInterface
 {
 public:
 	LinearSearch();
 	~LinearSearch();
 	void createDataStructure(int * arr, int arrSize);
-	int linSearch(int elem); 
+	int binSearch(int elem); 
 };
 
 #endif

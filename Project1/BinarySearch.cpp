@@ -38,7 +38,7 @@ int BinarySearch::binSearch(int elem)
 		curr = binaryArray[current];
 		smallestSoFar = current;
 	   }
-	  else if(curr < elem && high != low){
+	  else if(curr < elem && high > low){
 		  curr = binaryArray[current];
 		  smallestSoFar = current;
 		  low = current +1;
