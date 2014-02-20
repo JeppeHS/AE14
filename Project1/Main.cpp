@@ -67,13 +67,15 @@ int main(int argc, char **argv)
 		      PERF_COUNT_SW_TASK_CLOCK,
 		      PERF_COUNT_SW_CPU_CLOCK,
 		      PERF_COUNT_HW_CACHE_REFERENCES,
-		      PERF_COUNT_HW_CACHE_MISSES};
+		      PERF_COUNT_HW_CACHE_MISSES, 
+		      PERF_COUNT_HW_CPU_CYCLES};
   int HW = PERF_TYPE_HARDWARE;
   int SW = PERF_TYPE_SOFTWARE;
   int type_array[] = {HW,
 		      HW,
 		      SW,
 		      SW,
+		      HW,
 		      HW,
 		      HW};
   const int nStats = sizeof(conf_array)/sizeof(int);
@@ -82,7 +84,8 @@ int main(int argc, char **argv)
 				      "Task clock.csv",
 				      "CPU clock.csv",
 				      "Cache refs.csv",
-				      "Cache misses.csv"};
+				      "Cache misses.csv", 
+				      "Cpu cycles.csv"};
   int fd_array[nStats];
   perf_event_array(conf_array, type_array, fd_array, nStats);
 
@@ -104,7 +107,7 @@ int main(int argc, char **argv)
 		//cout << "Experiment " << i << endl;
 		
 		// Create random array
-		arrSize = i+1;
+		arrSize = (i+1)*100;
 		
 		//cout << "Arrsize " << arrSize << endl;
 		
