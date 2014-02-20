@@ -48,7 +48,7 @@ int BinarySearch::binSearch(int elem)
 			  return binaryArray[size-1];
 		  }
 		  if(binaryArray[0] > elem){
-			  return binaryArray[0];
+			  return -1;
 		  }
 		  int result = binaryArray[smallestSoFar];
 		  return result;

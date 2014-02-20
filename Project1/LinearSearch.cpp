@@ -31,8 +31,7 @@ int LinearSearch::binSearch(int elem)
 		  current++;
 	  }
 	  else if(current == 0){
-		  int result = linearArray[current];
-		  return result;
+		  return -1;
 	  }
 
       // If we have reached a bottom node, return the last element lower than 'elem'.
