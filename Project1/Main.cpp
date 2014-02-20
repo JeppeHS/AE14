@@ -4,6 +4,7 @@
 #include <iostream>
 #include <time.h>
 #include <algorithm>
+#include <cmath>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,12 +19,13 @@
 #include "BFSBinarySearch.h"
 #include "DFSBinarySearch.h"
 #include "BinarySearch.h"
-#include "vEBBinarySearch.h"
+#include "LinearSearch.h"
+//#include "vEBBinarySearch.h"
 
 using namespace std;
 
-const int NUM_EXPERIMENTS = 50;
-const int RUN_TIMES = 5;
+const int NUM_EXPERIMENTS = 100;
+const int RUN_TIMES = 10;
 
 timespec startTime, endTime;
 double timeDiff;
@@ -46,17 +48,18 @@ void perf_event_enable(int fd_array[], int nStats);
 void perf_event_disable(int fd_array[], int nStats);
 void read_all(long long stat_row[], int* fd_array, int nStats);
 
-const int nAlgos = 2;
-const char *algo_labels[nAlgos] = {"BFS", "DFS"};
+const int nAlgos = 3;
+const char *algo_labels[nAlgos] = {"Linear search", "BFS", "DFS"};
 const string output_dir = "Measurements";
 
 int main(int argc, char **argv)
 {
+  LinearSearch ls = LinearSearch();
+  BinarySearch inorder = BinarySearch();
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
-  BinarySearch inorder = BinarySearch();
-  vEBBinarySearch veb = vEBBinarySearch();
-  BinSearchInterface *algo_array[nAlgos] = {&bfs, &dfs};
+  //vEBBinarySearch veb = vEBBinarySearch();
+  BinSearchInterface *algo_array[nAlgos] = {&ls, &bfs, &dfs};
   
 
   int conf_array[] = {PERF_COUNT_HW_BRANCH_MISSES,
@@ -74,12 +77,12 @@ int main(int argc, char **argv)
 		      HW,
 		      HW};
   const int nStats = sizeof(conf_array)/sizeof(int);
-  const string conf_labels[nStats] = {"Branch misses",
-				      "Instructions",
-				      "Task clock",
-				      "CPU clock",
-				      "Cache refs",
-				      "Cache misses"};
+  const string conf_labels[nStats] = {"Branch misses.csv",
+				      "Instructions.csv",
+				      "Task clock.csv",
+				      "CPU clock.csv",
+				      "Cache refs.csv",
+				      "Cache misses.csv"};
   int fd_array[nStats];
   perf_event_array(conf_array, type_array, fd_array, nStats);
 
@@ -98,12 +101,15 @@ int main(int argc, char **argv)
 
 	int arrSize, low, high, searchFor;
 	for (int i = 0; i < NUM_EXPERIMENTS; i++) {
-	  //cout << "Experiment " << i << endl;
+		//cout << "Experiment " << i << endl;
 		
 		// Create random array
-		arrSize = 100*i+1;
+		arrSize = i+1;
+		
+		//cout << "Arrsize " << arrSize << endl;
+		
 		high = 100;
-		low = 0;
+		low = 1;
 		int array[arrSize];
 		fillArrayWithRandom(array, arrSize, low, high, i+1);
 		// Sort array
@@ -119,6 +125,9 @@ int main(int argc, char **argv)
 		for (int j = 0; j < RUN_TIMES; j++) {
 			searchFor = getRandomNumber(low, high, INT_MAX - j);	
 			
+			int oldRes = -1;
+			int newRes;
+			
 			// Perform experiments
 			{int iAlg;
 			  for (iAlg=0; iAlg<nAlgos; iAlg++){
@@ -127,10 +136,18 @@ int main(int argc, char **argv)
 			    perf_event_enable(fd_array, nStats);
 
 			    // Perform the binary search:
-			    (*algo_array[iAlg]).binSearch(searchFor);
+			    newRes = (*algo_array[iAlg]).binSearch(searchFor);
 
 			    // Stop all the stat-counters:
 			    perf_event_disable(fd_array, nStats);
+			    
+			    // Check result
+			    if (oldRes != -1 && oldRes != newRes) {
+					printf("Wrong result. prev-alg:%s, this-alg:%s ArrSize %d, searchFor %d\n", 
+						algo_labels[iAlg-1], algo_labels[iAlg], arrSize, searchFor); 			
+				}
+				oldRes = newRes;
+			    
 			    //printf("iAlg=%d done", iAlg); // TODO: remove print
 			    // Store the stats in the stat_array
 			    read_all(stat_array[iAlg][j], fd_array, nStats);

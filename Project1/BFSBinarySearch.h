@@ -48,7 +48,7 @@ public:
   int binSearch(int elem){
     int i = 0;
     int curr = bfsArray[i]; // The current node visited
-    int res = 0; // The latest element smaller than 'elem'.
+    int res = -1; // The latest element smaller than 'elem'.
     while (curr != elem){
       //cout << "curr="<<curr<<", i="<<i<<"\n"; //remove_this
       i = 2*i+1; // Left child

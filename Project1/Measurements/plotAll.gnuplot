@@ -3,7 +3,7 @@ set datafile separator ","
 set terminal png
 set xlabel "Array size"
 
-nAlgos = 2
+nAlgos = 3
 
 set key autotitle columnhead
 
