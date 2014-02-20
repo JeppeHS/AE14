@@ -18,15 +18,15 @@
 #include "BFSBinarySearch.h"
 #include "DFSBinarySearch.h"
 #include "BinarySearch.h"
+#include "vEBBinarySearch.h"
 
 using namespace std;
 
-const int NUM_EXPERIMENTS = 10;
-const int RUN_TIMES = 1;
+const int NUM_EXPERIMENTS = 50;
+const int RUN_TIMES = 5;
 
 timespec startTime, endTime;
 double timeDiff;
-//DFSBinarySearch dfs;
 
 int getRandomNumber(int low, int high, int seed);
 void fillArrayWithRandom(int * array, int size, int low, int high, int seed);
@@ -39,58 +39,75 @@ void experimentVEB(int elem);
 void create_all_data_structures(BinSearchInterface *algo_arrray, int *array, int arrSize);
 long perf_event_open(struct perf_event_attr *hw_event, pid_t pid,
 		     int cpu, int group_fd, unsigned long flags);
-int make_perf_event(int conf);
-void perf_event_array(int conf_array[], int* fd_array, int nStats);
+int make_perf_event(int conf, int type);
+void perf_event_array(int conf_array[], int type_array[], int* fd_array, int nStats);
 void perf_event_reset(int fd_array[], int nStats);
 void perf_event_enable(int fd_array[], int nStats);
 void perf_event_disable(int fd_array[], int nStats);
-void read_all(FILE *file, int* fd_array, int nStats);
+void read_all(long long stat_row[], int* fd_array, int nStats);
 
-const int nAlgos = 1;
-const char *algo_labels[nAlgos] = {"BFS.csv"};
-
+const int nAlgos = 2;
+const char *algo_labels[nAlgos] = {"BFS", "DFS"};
+const string output_dir = "Measurements";
 
 int main(int argc, char **argv)
 {
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
   BinarySearch inorder = BinarySearch();
-  BinSearchInterface *algo_array[nAlgos] = {&bfs};
+  vEBBinarySearch veb = vEBBinarySearch();
+  BinSearchInterface *algo_array[nAlgos] = {&bfs, &dfs};
   
 
   int conf_array[] = {PERF_COUNT_HW_BRANCH_MISSES,
-		  PERF_COUNT_HW_INSTRUCTIONS};
+		      PERF_COUNT_HW_INSTRUCTIONS,
+		      PERF_COUNT_SW_TASK_CLOCK,
+		      PERF_COUNT_SW_CPU_CLOCK,
+		      PERF_COUNT_HW_CACHE_REFERENCES,
+		      PERF_COUNT_HW_CACHE_MISSES};
+  int HW = PERF_TYPE_HARDWARE;
+  int SW = PERF_TYPE_SOFTWARE;
+  int type_array[] = {HW,
+		      HW,
+		      SW,
+		      SW,
+		      HW,
+		      HW};
   const int nStats = sizeof(conf_array)/sizeof(int);
-  const char *conf_labels[nStats] = {"Branch misses",
-				     "Instructions"};
+  const string conf_labels[nStats] = {"Branch misses",
+				      "Instructions",
+				      "Task clock",
+				      "CPU clock",
+				      "Cache refs",
+				      "Cache misses"};
   int fd_array[nStats];
-  perf_event_array(conf_array, fd_array, nStats);
+  perf_event_array(conf_array, type_array, fd_array, nStats);
 
-  //int nRuns = 1;
-  //  long long stats[nRuns][nStats];
+  long long stat_array[nAlgos][RUN_TIMES][nStats];
 	
 
-  FILE *files[nAlgos];
-  {int i; for (i=0; i<nAlgos; i++) {
-      files[i] = fopen(algo_labels[i], "w");
-      int j; for (j=0; j<nStats; j++) {
-	fprintf(files[i], "%s,", conf_labels[j]);
+  FILE *files[nStats];
+  {int i; for (i=0; i<nStats; i++) {
+      files[i] = fopen((output_dir + "/" + conf_labels[i]).c_str(), "w");
+      fprintf(files[i], "Array size,");
+      int j; for (j=0; j<nAlgos; j++) {
+	fprintf(files[i], "%s,", algo_labels[j]);
       }
       fprintf(files[i], "\n");
     }}
 
 	int arrSize, low, high, searchFor;
 	for (int i = 0; i < NUM_EXPERIMENTS; i++) {
-		cout << "Experiment " << i << endl;
+	  //cout << "Experiment " << i << endl;
 		
 		// Create random array
-		arrSize = i+1;
+		arrSize = 100*i+1;
 		high = 100;
 		low = 0;
 		int array[arrSize];
 		fillArrayWithRandom(array, arrSize, low, high, i+1);
 		// Sort array
-		//sort(array, array + arrSize);
+		sort(array, array + arrSize);
 		
 		// Set up algorithms
 		{int i;
@@ -106,13 +123,34 @@ int main(int argc, char **argv)
 			{int iAlg;
 			  for (iAlg=0; iAlg<nAlgos; iAlg++){
 			    perf_event_reset(fd_array, nStats);
+			    // Start all the stat-counters:
 			    perf_event_enable(fd_array, nStats);
+
+			    // Perform the binary search:
 			    (*algo_array[iAlg]).binSearch(searchFor);
-			    printf("iAlg=%d done", iAlg);
+
+			    // Stop all the stat-counters:
 			    perf_event_disable(fd_array, nStats);
-			    read_all(files[iAlg], fd_array, nStats);
+			    //printf("iAlg=%d done", iAlg); // TODO: remove print
+			    // Store the stats in the stat_array
+			    read_all(stat_array[iAlg][j], fd_array, nStats);
 			  }}
 		}
+
+		// Loop through all the implementations and calculate the average of every stat for searches with this array size.
+		{for (int iStat = 0; iStat<nStats; iStat++){
+		    fprintf(files[iStat], "%d,",arrSize);
+		    for (int iAlg=0; iAlg<nAlgos; iAlg++){
+		      long long stat_sum = 0;
+		      for (int j=0; j<RUN_TIMES; j++){
+			stat_sum += stat_array[iAlg][j][iStat];
+			//cout << stat_sum << endl;
+		      }
+		      long long stat_avg = stat_sum / RUN_TIMES;
+		      fprintf(files[iStat], "%lld,", stat_avg);
+		    }
+			fprintf(files[iStat], "\n");
+		  }}
 	}
 	
 	// TODO: Perhaps close the fd_array and files...
@@ -152,14 +190,13 @@ long perf_event_open(struct perf_event_attr *hw_event, pid_t pid,
   return ret;
 }
 
-int make_perf_event(int conf){
+int make_perf_event(int conf, int type){
   struct perf_event_attr pe;
   int fd;
 
   memset(&pe, 0, sizeof(struct perf_event_attr));
-  pe.type = PERF_TYPE_HARDWARE;
+  pe.type = type;
   pe.size = sizeof(struct perf_event_attr);
-  //pe.config = PERF_COUNT_HW_INSTRUCTIONS;
   pe.config = conf;
   pe.disabled = 1;
   pe.exclude_kernel = 1;
@@ -173,10 +210,10 @@ int make_perf_event(int conf){
   return fd;
 }
 
-void perf_event_array(int conf_array[], int* fd_array, int nStats){
+void perf_event_array(int conf_array[], int type_array[], int* fd_array, int nStats){
   int i;
   for (i=0; i<nStats; i++) {
-    fd_array[i] = make_perf_event(conf_array[i]);
+    fd_array[i] = make_perf_event(conf_array[i], type_array[i]);
   }
 }
 
@@ -201,12 +238,13 @@ void perf_event_disable(int fd_array[], int nStats){
   }
 }
 
-void read_all(FILE *file, int* fd_array, int nStats){
+void read_all(long long stat_row[], int* fd_array, int nStats){
   int i;
   for (i=0; i<nStats; i++){
     long long stat = 0;
     read(fd_array[i], &stat, sizeof(long long));
-    fprintf(file, "%lld,", stat);
+    stat_row[i] = stat;
+    //fprintf(file, "%lld,", stat);
   }
-  fprintf(file, "\n");
+  //fprintf(file, "\n");
 }

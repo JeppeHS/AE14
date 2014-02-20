@@ -27,21 +27,21 @@ public:
     linArray = arr;
 
     //remove_this printing stuff
-    {int i;
-    for (i=0;i<size;i++) {
-      cout << linArray[i] << "\t";
-    }}
-    cout << "\n";
+    //    {int i;
+    //for (i=0;i<size;i++) {
+    // cout << linArray[i] << "\t";
+    //}}
+    //cout << "\n";
     
     linIndex = 0;
     insert(0);
     
     //remove_this printing stuff
-    int i;
-    for (i=0;i<size;i++) {
-      cout << bfsArray[i] << "\t";
-    }
-    cout << "\n";
+    //int i;
+    //for (i=0;i<size;i++) {
+    //  cout << bfsArray[i] << "\t";
+    //}
+    //cout << "\n";
   };
 
   // Binary search in a BFS array. 
@@ -50,7 +50,7 @@ public:
     int curr = bfsArray[i]; // The current node visited
     int res = 0; // The latest element smaller than 'elem'.
     while (curr != elem){
-     cout << "curr="<<curr<<", i="<<i<<"\n"; //remove_this
+      //cout << "curr="<<curr<<", i="<<i<<"\n"; //remove_this
       i = 2*i+1; // Left child
       if (curr < elem){
 	i++; // Right child (=left+1)
@@ -59,7 +59,7 @@ public:
 
       // If we have reached a bottom node, return the last element lower than 'elem'.
       if (i >= size){
-	cout << "i>=size: "<<i<<">="<<size<<"\n"; //remove_this
+	//cout << "i>=size: "<<i<<">="<<size<<"\n"; //remove_this
 	return res;
       }
 

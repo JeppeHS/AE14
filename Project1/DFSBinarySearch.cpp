@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <stdio.h>
 #include "DFSBinarySearch.h"
 
 using namespace std;
@@ -7,9 +8,9 @@ using namespace std;
 int * dfsArr;
 int dfsArrSize;
 int treeHeight;
-int dfsInsertAt;
+int insertFrom;
 
-void dfsInsert(int node, int * inputArr, int * outputArr, int atDepth);
+void dfsInsert(int dfsIdx, int atDepth, int * inputArr);
 
 DFSBinarySearch::DFSBinarySearch() {
 }
@@ -22,46 +23,50 @@ void DFSBinarySearch::createDataStructure(int * arr, int arrSize)
 	dfsArrSize = arrSize;
 	dfsArr = new int[arrSize];
 	treeHeight = floor(log2(arrSize));
-		
+
 	// Algorithm
-	int root = floor(arrSize/2);
-	int depth = 0;
-	dfsInsertAt = 0;
-	dfsInsert(root, arr, dfsArr, depth);	
+	insertFrom = 0;
+	dfsInsert(0, 0, arr);	
 }
 
-void dfsInsert(int node, int * inputArr, int * outputArr, int atDepth) {
-	//Insert self
-	dfsArr[dfsInsertAt] = inputArr[node];
-	dfsInsertAt++;
-	
-	if (atDepth < treeHeight) {	
-		int offset = floor(pow(2, (treeHeight - 1 - atDepth)));
-		atDepth++;
+void dfsInsert(int dfsIdx, int atDepth, int * inputArr) {
+	if (dfsIdx < dfsArrSize) {
 		
-		// Go left
-		int lChild = node - offset;
-		dfsInsert(lChild, inputArr, outputArr, atDepth);
-		
-		// Go right
-		int rChild = node + offset;
-		dfsInsert(rChild, inputArr, outputArr, atDepth);
-	} 
+		if (atDepth <= treeHeight) {	
+			int offset = floor(pow(2, (treeHeight - atDepth)));
+			atDepth++;
+			
+			// Go left;
+			dfsInsert(dfsIdx + 1, atDepth, inputArr);
+				
+			// Insert self	
+			dfsArr[dfsIdx] = inputArr[insertFrom];
+			insertFrom++;
+			
+			// Go right
+			dfsInsert(dfsIdx + offset, atDepth, inputArr);
+		 } 
+	}
 }
 
 int DFSBinarySearch::binSearch(int elem) 
 {
-	int max = dfsArr[0];
+	int maxVal = -1;
 	int node = 0; 		// Start at root located at first pos 
 	int val;
 	int atDepth = 0;
 	
-	while (node < dfsArrSize && atDepth <= treeHeight) {
+	while (node >= 0 && node < dfsArrSize) {
 		val = dfsArr[node];
-		
+			
 		if ( elem == val ) {
 			return val;
 		
+		} else if (atDepth == treeHeight) {
+			if (val < elem) {
+				return val;
+			}	
+					
 		} else if ( elem < val ) {
 			// Go left
 			node = node + 1;
@@ -69,11 +74,11 @@ int DFSBinarySearch::binSearch(int elem)
 		} else {
 			// Go right
 			node = node + floor(pow(2, (treeHeight - atDepth)));
-			max = val;
+			maxVal = val;
 		}	
 		atDepth++;
 	}
 	
-	return max;
+	return maxVal;
 }
 

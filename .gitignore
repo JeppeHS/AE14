@@ -16,4 +16,5 @@
 *.gch
 *.csv
 geany_run_script.sh
+*.png
 
