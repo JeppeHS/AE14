@@ -19,7 +19,7 @@ void LinearSearch::createDataStructure(int * arr, int arrSize)
 	linearArray = arr;
 }
 
-int LinearSearch::linSearch(int elem) 
+int LinearSearch::binSearch(int elem) 
 {	
 	int current  = 0;
 	int curr = linearArray[current]; // The current node visited
