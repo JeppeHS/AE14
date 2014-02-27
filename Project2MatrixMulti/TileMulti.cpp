@@ -2,7 +2,6 @@
 #include <iostream>
 #include <stdio.h>
 #include "TileMulti.h"
-#include "matrix.h"
 
 using namespace std;
 
@@ -27,8 +26,7 @@ matrix * TileMulti::matrixMultiplication(matrix* B)
 	int CSize = min(AHeight, AWidth);
 	matrix* C = createMatrix(CSize, CSize);	
 
-	matrixPut(C, 1, 1, 10);
-
+	matrixPut(C, 1, 1, 12);
 
 	printf("Get 1,1 : %f\n", matrixGet(C, 1, 1));
 

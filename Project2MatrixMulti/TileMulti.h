@@ -3,7 +3,6 @@
 #define TILEMULTI_H
 
 #include "IMatrixMulti.h"
-#include "matrix.h"
 
 class TileMulti : public IMatrixMulti
 {
