@@ -27,16 +27,9 @@ using namespace std;
 const int NUM_EXPERIMENTS = 100;
 const int RUN_TIMES = 10;
 
-timespec startTime, endTime;
-double timeDiff;
-
 int getRandomNumber(int low, int high, int seed);
 void fillArrayWithRandom(int * array, int size, int low, int high, int seed);
-void experimentLinearSearch(int elem);
-void experimentBasicAlgorithm(int elem);
-void experimentBFS(int elem);
-void experimentDFS(int elem);
-void experimentVEB(int elem);
+timespec getTimeDiff(timespec start, timespec end);
 
 void create_all_data_structures(BinSearchInterface *algo_arrray, int *array, int arrSize);
 long perf_event_open(struct perf_event_attr *hw_event, pid_t pid,
@@ -51,6 +44,8 @@ void read_all(long long stat_row[], int* fd_array, int nStats);
 const int nAlgos = 4;
 const char *algo_labels[nAlgos] = {"Linear search", "Inorder", "BFS", "DFS"};
 const string output_dir = "Measurements";
+
+timespec startTime, endTime, timeDiff;
 
 int main(int argc, char **argv)
 {
@@ -91,6 +86,15 @@ int main(int argc, char **argv)
 
   long long stat_array[nAlgos][RUN_TIMES][nStats];
 	
+  // Timing: Prepare file
+  FILE * timeFile;
+  timeFile = fopen((output_dir + "/Time in ns.csv").c_str(), "w");
+  fprintf(timeFile, "Array size,");
+  for (int i = 0; i < nAlgos; i++) {
+  	fprintf(timeFile, "%s,", algo_labels[i]);
+  }
+  fprintf(timeFile, "\n");
+
 
   FILE *files[nStats];
   {int i; for (i=0; i<nStats; i++) {
@@ -111,7 +115,7 @@ int main(int argc, char **argv)
 		
 		//cout << "Arrsize " << arrSize << endl;
 		
-		high = 100;
+		high = arrSize;
 		low = 1;
 		int array[arrSize];
 		fillArrayWithRandom(array, arrSize, low, high, i+1);
@@ -124,16 +128,29 @@ int main(int argc, char **argv)
 		   (*algo_array[i]).createDataStructure(array, arrSize);
 		 }}
 		
+		// Timing: Setup array
+		long tmpDiff; 
+		long timeArray[nAlgos];
+		for (int j = 0; j < nAlgos; j++) {
+			timeArray[j] = 0;
+		}		 
+
 		// Repeat experiments
 		for (int j = 0; j < RUN_TIMES; j++) {
-			searchFor = getRandomNumber(low, high, INT_MAX - j);	
-			
+			searchFor = getRandomNumber(low, high, INT_MAX - j);
+			//searchFor = low;	
+			//searchFor = high;
+
 			int oldRes = -1;
 			int newRes;
 			
 			// Perform experiments
 			{int iAlg;
 			  for (iAlg=0; iAlg<nAlgos; iAlg++){
+			    
+			    // Timing
+				clock_gettime(CLOCK_REALTIME, &startTime); 
+
 			    perf_event_reset(fd_array, nStats);
 			    // Start all the stat-counters:
 			    perf_event_enable(fd_array, nStats);
@@ -144,6 +161,13 @@ int main(int argc, char **argv)
 			    // Stop all the stat-counters:
 			    perf_event_disable(fd_array, nStats);
 			    
+			    // Timing
+			    clock_gettime(CLOCK_REALTIME, &endTime); 
+			    timeDiff = getTimeDiff(startTime, endTime); 
+			    tmpDiff = timeArray[iAlg];
+			    timeArray[iAlg] = tmpDiff + timeDiff.tv_nsec; 
+
+
 			    // Check result
 			    if (oldRes != -1 && oldRes != newRes) {
 					printf("Wrong result. prev:%s %d, new:%s %d, ArrSize %d, searchFor %d\n", 
@@ -178,6 +202,13 @@ int main(int argc, char **argv)
 		    }
 			fprintf(files[iStat], "\n");
 		  }}
+
+		// Timing: Save time values
+		fprintf(timeFile, "%d,", arrSize);  
+		for (int j = 0; j < nAlgos; j++) {
+			fprintf(timeFile, "%ld,", timeArray[j]/RUN_TIMES);
+		}  
+		fprintf(timeFile, "\n");
 	}
 	
 	// TODO: Perhaps close the fd_array and files...
@@ -197,6 +228,18 @@ void fillArrayWithRandom(int * array, int size, int low, int high, int seed)
 	} 
 }
 
+timespec getTimeDiff(timespec start, timespec end)
+{
+    timespec temp;
+    if ((end.tv_nsec-start.tv_nsec)<0) {
+        temp.tv_sec = end.tv_sec-start.tv_sec-1;
+        temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+    } else {
+        temp.tv_sec = end.tv_sec-start.tv_sec;
+        temp.tv_nsec = end.tv_nsec-start.tv_nsec;
+    }
+    return temp;
+}
 /*
 void create_all_data_structures(BinSearchInterface *algo_array, int *array, int arrSize) {
   int i;

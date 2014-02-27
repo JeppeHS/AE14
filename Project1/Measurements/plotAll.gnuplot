@@ -34,3 +34,7 @@ plot for [i=2:nAlgos+1] 'Cache misses.csv' using 1:i with lines
 set output "Cpu cycles.png"
 set ylabel "#Cpu cycles"
 plot for [i=2:nAlgos+1] 'Cpu cycles.csv' using 1:i with lines
+
+set output "Time.png"
+set ylabel "Time in ns"
+plot for [i=2:nAlgos+1] 'Time in ns.csv' using 1:i with lines
