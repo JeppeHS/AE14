@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int AHeight, AWidth; 
+matrix* mA;
 
 TileMulti::TileMulti() 
 {
@@ -17,18 +17,21 @@ TileMulti::~TileMulti()
 
 void TileMulti::setup(matrix* A, int height, int width) 
 {
-	AHeight = height;
-	AWidth = width;
+	mA = A;
 }
 
 matrix * TileMulti::matrixMultiplication(matrix* B)
 {
-	int CSize = min(AHeight, AWidth);
-	matrix* C = createMatrix(CSize, CSize);	
+	// Create output matrix
+	matrix* C = createMatrix((*B).nRows, (*mA).nCols);	
+	printf("Initialized output matrix with %d rows and %d cols\n", (*C).nRows, (*C).nCols);
+	
+
+
 
 	matrixPut(C, 1, 1, 12);
 
-	printf("Get 1,1 : %f\n", matrixGet(C, 1, 1));
+	printf("Get 1,1 : %d\n", matrixGet(C, 1, 1));
 
 	return C;
 }

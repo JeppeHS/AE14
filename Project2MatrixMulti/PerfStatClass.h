@@ -40,9 +40,9 @@ void endTimeNow();
 		      PERF_COUNT_HW_CPU_CYCLES,
 		      PERF_COUNT_SW_PAGE_FAULTS,
 		      PERF_COUNT_SW_PAGE_FAULTS_MIN,
-		      PERF_COUNT_SW_PAGE_FAULTS_MAJ,
-		      (PERF_COUNT_HW_CACHE_L1D) | (PERF_COUNT_HW_CACHE_OP_READ << 8) | (PERF_COUNT_HW_CACHE_RESULT_ACCESS << 16),
-		      (PERF_COUNT_HW_CACHE_L1D) | (PERF_COUNT_HW_CACHE_OP_READ << 8) | (PERF_COUNT_HW_CACHE_RESULT_MISS << 16)};
+		      PERF_COUNT_SW_PAGE_FAULTS_MAJ};
+		      //(PERF_COUNT_HW_CACHE_L1D) | (PERF_COUNT_HW_CACHE_OP_READ << 8) | (PERF_COUNT_HW_CACHE_RESULT_ACCESS << 16),
+		      //(PERF_COUNT_HW_CACHE_L1D) | (PERF_COUNT_HW_CACHE_OP_READ << 8) | (PERF_COUNT_HW_CACHE_RESULT_MISS << 16)};
 
 
   static int HW = PERF_TYPE_HARDWARE;
@@ -57,9 +57,9 @@ void endTimeNow();
 		      HW,
 		      SW,
 		      SW,
-		      SW,
-		      HW_C,
-		      HW_C};
+		      SW};
+		      //HW_C,
+		      //HW_C};
 
   static const int nStats = sizeof(conf_array)/sizeof(int);
   
@@ -74,9 +74,9 @@ void endTimeNow();
 				"Cpu cycles.csv",
 				"Page faults.csv",
 				"Page faults Non-IO.csv",
-				"Page faults IO.csv",
-				"Cache_L1D accesses.csv",
-				"Cache_L1D misses.csv"};
+				"Page faults IO.csv"};
+				//"Cache_L1D accesses.csv",
+				//"Cache_L1D misses.csv"};
 
 
 

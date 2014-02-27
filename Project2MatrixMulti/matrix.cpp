@@ -10,7 +10,7 @@ matrix* createMatrix(int nRows, int nCols)
 	}
   (*m).nRows = nRows;
   (*m).nCols = nCols;
-  (*m).data = (double*) malloc(nRows*nCols*sizeof(double));
+  (*m).data = (int*) malloc(nRows*nCols*sizeof(int));
   return m;
 }
 
@@ -19,7 +19,7 @@ void destroyMatrix(matrix* m) {
 	free(m); 
 }
 
-void matrixPut(matrix* m, int i, int j, double value)
+void matrixPut(matrix* m, int i, int j, int value)
 {
   assert(0<=i && i<(*m).nRows);
   assert(0<=j && j<(*m).nCols);
@@ -27,7 +27,7 @@ void matrixPut(matrix* m, int i, int j, double value)
   (*m).data[indx]=value;
 }
 
-double matrixGet(matrix* m, int i, int j) 
+int matrixGet(matrix* m, int i, int j) 
 {
   assert(0<=i && i<(*m).nRows);
   assert(0<=j && j<(*m).nCols);
@@ -35,3 +35,14 @@ double matrixGet(matrix* m, int i, int j)
   return (*m).data[indx];
 }
 
+void matrixPrint(matrix* m) {
+  printf("Matrix:\n");  
+  for (int i = 0; i < m->nCols; i++) {
+    printf("[");
+    for (int j = 0; j < m->nRows; j++) {
+      printf("%d | ", matrixGet(m, i, j));
+    }
+    printf("]\n");
+  }
+  printf("\n");
+}

@@ -5,10 +5,11 @@
 #include <cstdio>
 #include <cassert>
 
-typedef struct {int nRows, nCols; double* data;} matrix;
+typedef struct {int nRows, nCols; int* data;} matrix;
 matrix* createMatrix(int nRows, int nCols);
 void destroyMatrix(matrix* m);
-void matrixPut(matrix* m, int i, int j, double value);
-double matrixGet(matrix* m, int i, int j);
+void matrixPut(matrix* m, int i, int j, int value);
+int matrixGet(matrix* m, int i, int j);
+void matrixPrint(matrix* m);
 
 #endif /* MATRIX_H */
