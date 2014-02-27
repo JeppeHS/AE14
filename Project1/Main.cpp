@@ -26,7 +26,7 @@
 
 using namespace std;
 
-const int NUM_EXPERIMENTS = 50;
+const int NUM_EXPERIMENTS = 100;
 const int RUN_TIMES = 1000;
 const int ARR_SIZE_SCALING = 1501;
 const int ARR_SIZE_OFFSET = 50000;
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
   vEBBinarySearch veb = vEBBinarySearch();
-  BinSearchInterface *algo_array[] = {&inorder, &bfs, &veb};  // <-- Choose the implementations to run.
+  BinSearchInterface *algo_array[] = {&inorder, &bfs, &veb, &dfs};  // <-- Choose the implementations to run.
   const int nAlgos = sizeof(algo_array)/sizeof(BinSearchInterface*);
   const char *algo_labels[nAlgos] = {};
   for (int i=0; i<nAlgos; i++) {

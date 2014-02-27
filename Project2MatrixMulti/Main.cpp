@@ -1,8 +1,11 @@
+#include "PerfStatClass.h"
 
 
-int main(int argc, char **argv)
+class Main : public PerfStatClass
 {
+  int main(int argc, char **argv)
+  {
 
-
-}
-
+    return 0;
+  }
+};

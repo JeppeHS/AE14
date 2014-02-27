@@ -64,7 +64,7 @@ int vEBBinarySearch::binSearch(int elem){
   //start();
   int vebIndex = 0;
   int curr = vebArray[vebIndex]; // The current node visited
-  int res = 0; // The latest element smaller than 'elem'.
+  int res = -1; // The latest element smaller than 'elem'.
   int atDepth = 0;
   int depthIndex = 0;
 
