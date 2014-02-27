@@ -26,19 +26,14 @@
 
 using namespace std;
 
-const int NUM_EXPERIMENTS = 100;
-const int RUN_TIMES = 100;
-const int ARR_SIZE_SCALING = 150001;
+const int NUM_EXPERIMENTS = 50;
+const int RUN_TIMES = 1000;
+const int ARR_SIZE_SCALING = 1501;
 const int ARR_SIZE_OFFSET = 50000;
 const int MEM_MAX = 1000000000;
 
-<<<<<<< HEAD
-timespec startTime, endTime;
-//double timeDiff;
 
 timespec diff(timespec start, timespec end);
-=======
->>>>>>> ee90cdbc5d52c4111dc8393af3bde1611236d545
 int getRandomNumber(int low, int high, int seed);
 void fillArrayWithRandom(int * array, int size, int low, int high, int seed);
 timespec getTimeDiff(timespec start, timespec end);
@@ -112,7 +107,6 @@ int main(int argc, char **argv)
 		      HW_C};
   const int nStats = sizeof(conf_array)/sizeof(int);
 
-  const int nStats = nStats;
   string conf_labels[nStats] = {"Branch misses.csv",
 				      "Instructions.csv",
 				      "Task clock.csv",
@@ -126,10 +120,8 @@ int main(int argc, char **argv)
 				     "Cache_L1D accesses.csv",
 				     "Cache_L1D misses.csv"};
 
-<<<<<<< HEAD
   int fd_array[nStats];
   perf_event_array(conf_array, type_array, fd_array, nStats);
-=======
   long long stat_array[nAlgos][RUN_TIMES][nStats];
 	
   // Timing: Prepare file
@@ -141,10 +133,6 @@ int main(int argc, char **argv)
   }
   fprintf(timeFile, "\n");
 
->>>>>>> ee90cdbc5d52c4111dc8393af3bde1611236d545
-
-  long long stat_array[nAlgos][RUN_TIMES][nStats];
-  
 
   FILE *files[nStats];
   {int i; for (i=0; i<nStats; i++) {
@@ -177,61 +165,8 @@ int main(int argc, char **argv)
 		{int i;
 		 for (i=0; i<nAlgos; i++) {
 		   (*algo_array[i]).createDataStructure(array, arrSize);
-<<<<<<< HEAD
 		   }}
 
-
-		// Perform experiments
-		for (int iAlg=0; iAlg<nAlgos; iAlg++){
-		  
-		  // Repeat experiments
-		  for (int j = 0; j < RUN_TIMES; j++) {
-		    
-		    // TODO: this does not need to be done for every search, but it gives a more realistic measurement of cache refs and misses?
-		    // Set up algorithms
-		    /*{int i;
-		      for (i=0; i<nAlgos; i++) {
-		      (*algo_array[i]).createDataStructure(array, arrSize);
-		      }}*/
-		    
-		    searchFor = getRandomNumber(low, high, INT_MAX - j);	
-		    
-		    int oldRes = -1;
-		    int newRes;
-		    
-		    //chrono::high_resolution_clock::time_point start;
-		    //chrono::high_resolution_clock::time_point finish;
-		    
-		    // reset the clock
-		    //long start, finish;
-		    startTime.tv_sec = 0;
-		    startTime.tv_nsec = 0;
-		    endTime.tv_sec = 0;
-		    endTime.tv_nsec = 0;
-		    
-		    perf_event_reset(fd_array, nStats);
-		    // Start all the stat-counters:
-		    perf_event_enable(fd_array, nStats);
-			    
-		    // Perform the binary search:
-		    newRes = (*algo_array[iAlg]).binSearch(searchFor);
-		    
-		    
-		    // Stop all the stat-counters:
-		    perf_event_disable(fd_array, nStats);
-		    
-		    // Check result
-		    if (oldRes != -1 && oldRes != newRes) {
-		      printf("Wrong result. prev:%s %d, new:%s %d, ArrSize %d, searchFor %d\n", 
-		      algo_labels[iAlg-1], oldRes, algo_labels[iAlg], newRes, arrSize, searchFor); 
-		      
-		      printf("Arr: [");
-		      for (int k=0; k < arrSize; k++) {
-		      printf("%d,", array[k]);
-		      }
-		      printf("]\n");
-=======
-		 }}
 		
 		// Timing: Setup array
 		long tmpDiff; 
@@ -277,16 +212,16 @@ int main(int argc, char **argv)
 			    if (oldRes != -1 && oldRes != newRes) {
 					printf("Wrong result. prev:%s %d, new:%s %d, ArrSize %d, searchFor %d\n", 
 						algo_labels[iAlg-1], oldRes, algo_labels[iAlg], newRes, arrSize, searchFor); 
->>>>>>> ee90cdbc5d52c4111dc8393af3bde1611236d545
 					
-		      }
+			    }
 		      oldRes = newRes;
 		    
 		    //printf("iAlg=%d done", iAlg); // TODO: remove print
 		    // Store the stats in the stat_array
 		    read_all(stat_array[iAlg][j], fd_array, nStats);
 		    
-		  }
+			  }
+			}
 		}
 	
 	// Loop through all the implementations and calculate the average of every stat for searches with this array size.
@@ -305,34 +240,17 @@ int main(int argc, char **argv)
 			fprintf(files[iStat], "\n");
 		  }}
 
-<<<<<<< HEAD
 		delete [] array;
 		array = NULL;
-=======
 		// Timing: Save time values
 		fprintf(timeFile, "%d,", arrSize);  
 		for (int j = 0; j < nAlgos; j++) {
 			fprintf(timeFile, "%ld,", timeArray[j]/RUN_TIMES);
 		}  
 		fprintf(timeFile, "\n");
->>>>>>> ee90cdbc5d52c4111dc8393af3bde1611236d545
 	}
-	
 	// TODO: Perhaps close the fd_array and files...
 	return 0;
-}
-
-timespec diff(timespec start, timespec end)
-{
-	timespec temp;
-	if ((end.tv_nsec-start.tv_nsec)<0) {
-		temp.tv_sec = end.tv_sec-start.tv_sec-1;
-		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
-	} else {
-		temp.tv_sec = end.tv_sec-start.tv_sec;
-		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
-	}
-	return temp;
 }
 
 int getRandomNumber(int low, int high, int seed) {
