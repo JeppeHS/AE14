@@ -1,7 +1,11 @@
-all: main.o
+CC = g++
+CPPFLAGS = -std=c++0x -Wall -O3
 
-main.o: Main.cpp
-	g++ Main.cpp *.h *Search.cpp -Wall
+OBJ = Main.o BinarySearch.o DFSBinarySearch.o LinearSearch.o BFSBinarySearch.o  vEBBinarySearch.o
+
+all: Main
+
+Main: $(OBJ) -lrt
 
 clean:
-	$(RM) main
+	$(RM) Main $(OBJ)

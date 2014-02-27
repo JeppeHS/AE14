@@ -21,6 +21,7 @@ DFSBinarySearch::~DFSBinarySearch() {
 void DFSBinarySearch::createDataStructure(int * arr, int arrSize) 
 {	
 	dfsArrSize = arrSize;
+	delete [] dfsArr;
 	dfsArr = new int[arrSize];
 	treeHeight = floor(log2(arrSize));
 
@@ -73,7 +74,8 @@ int DFSBinarySearch::binSearch(int elem)
 	
 		} else {
 			// Go right
-			node = node + floor(pow(2, (treeHeight - atDepth)));
+			//node = node + floor(pow(2, (treeHeight - atDepth)));
+       		        node = node + (1<<(treeHeight-atDepth));
 			maxVal = val;
 		}	
 		atDepth++;

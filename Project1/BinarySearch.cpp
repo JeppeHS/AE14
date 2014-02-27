@@ -17,8 +17,13 @@ BinarySearch::~BinarySearch() {
 
 void BinarySearch::createDataStructure(int * arr, int arrSize) 
 {	
-	binaryArray = arr;
-	size = arrSize;	
+  	size = arrSize;	
+  //	binaryArray = arr;
+  delete [] binaryArray;
+  binaryArray = new int[size];
+  for (int i=0; i<size; i++) {
+    binaryArray[i] = arr[i];
+  }
 }
 
 int BinarySearch::binSearch(int elem) 

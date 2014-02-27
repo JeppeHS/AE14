@@ -11,6 +11,7 @@ public:
 	~DFSBinarySearch();
 	void createDataStructure(int * arr, int arrSize);
 	int binSearch(int elem); 
+	char const* getLabel(){return "DFS";};
 };
 
 #endif

@@ -7,6 +7,7 @@ class BinSearchInterface
 public:
   virtual void createDataStructure(int* arr, int arrSize) = 0;
   virtual int binSearch(int elem) = 0;
+  virtual char const* getLabel() = 0;
 };
 
 #endif

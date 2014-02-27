@@ -5,6 +5,8 @@
 #include <time.h>
 #include <algorithm>
 #include <cmath>
+#include <chrono>
+#include <time.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -20,16 +22,20 @@
 #include "DFSBinarySearch.h"
 #include "BinarySearch.h"
 #include "LinearSearch.h"
-//#include "vEBBinarySearch.h"
+#include "vEBBinarySearch.h"
 
 using namespace std;
 
 const int NUM_EXPERIMENTS = 100;
-const int RUN_TIMES = 10;
+const int RUN_TIMES = 100;
+const int ARR_SIZE_SCALING = 150001;
+const int ARR_SIZE_OFFSET = 50000;
+const int MEM_MAX = 1000000000;
 
 timespec startTime, endTime;
-double timeDiff;
+//double timeDiff;
 
+timespec diff(timespec start, timespec end);
 int getRandomNumber(int low, int high, int seed);
 void fillArrayWithRandom(int * array, int size, int low, int high, int seed);
 void experimentLinearSearch(int elem);
@@ -42,25 +48,36 @@ void create_all_data_structures(BinSearchInterface *algo_arrray, int *array, int
 long perf_event_open(struct perf_event_attr *hw_event, pid_t pid,
 		     int cpu, int group_fd, unsigned long flags);
 int make_perf_event(int conf, int type);
-void perf_event_array(int conf_array[], int type_array[], int* fd_array, int nStats);
-void perf_event_reset(int fd_array[], int nStats);
-void perf_event_enable(int fd_array[], int nStats);
-void perf_event_disable(int fd_array[], int nStats);
-void read_all(long long stat_row[], int* fd_array, int nStats);
+void perf_event_array(int conf_array[], int type_array[], int* fd_array, int nStatsPerf);
+void perf_event_reset(int fd_array[], int nStatsPerf);
+void perf_event_enable(int fd_array[], int nStatsPerf);
+void perf_event_disable(int fd_array[], int nStatsPerf);
+void read_all(long long stat_row[], int* fd_array, int nStatsPerf);
 
-const int nAlgos = 4;
-const char *algo_labels[nAlgos] = {"Linear search", "Inorder", "BFS", "DFS"};
+
 const string output_dir = "Measurements";
 
 int main(int argc, char **argv)
 {
+  //cout << ARR_SIZE_SCALING << endl;
   LinearSearch ls = LinearSearch();
   BinarySearch inorder = BinarySearch();
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
-  //vEBBinarySearch veb = vEBBinarySearch();
-  BinSearchInterface *algo_array[nAlgos] = {&ls, &inorder, &bfs, &dfs};
-  
+  vEBBinarySearch veb = vEBBinarySearch();
+  BinSearchInterface *algo_array[] = {&inorder, &bfs, &veb};  // <-- Choose the implementations to run.
+  const int nAlgos = sizeof(algo_array)/sizeof(BinSearchInterface*);
+  const char *algo_labels[nAlgos] = {};
+  for (int i=0; i<nAlgos; i++) {
+    algo_labels[i] = (*algo_array[i]).getLabel();
+  }
+
+  double memReq = (double)((nAlgos*NUM_EXPERIMENTS*ARR_SIZE_SCALING + ARR_SIZE_OFFSET)*sizeof(int));
+  printf("The following runs will use up to %g bytes of memory.\n",memReq);
+  if (memReq > MEM_MAX) {
+    printf("... which is more than the maximum limit set (%ld). Aborting.\n", MEM_MAX);
+    return 0;
+  }
 
   int conf_array[] = {PERF_COUNT_HW_BRANCH_MISSES,
 		      PERF_COUNT_HW_INSTRUCTIONS,
@@ -68,32 +85,54 @@ int main(int argc, char **argv)
 		      PERF_COUNT_SW_CPU_CLOCK,
 		      PERF_COUNT_HW_CACHE_REFERENCES,
 		      PERF_COUNT_HW_CACHE_MISSES, 
-		      PERF_COUNT_HW_CPU_CYCLES};
+		      PERF_COUNT_HW_CPU_CYCLES,
+		      PERF_COUNT_SW_PAGE_FAULTS,
+		      PERF_COUNT_SW_PAGE_FAULTS_MIN,
+		      PERF_COUNT_SW_PAGE_FAULTS_MAJ,
+		      (PERF_COUNT_HW_CACHE_L1D) | (PERF_COUNT_HW_CACHE_OP_READ << 8) | (PERF_COUNT_HW_CACHE_RESULT_ACCESS << 16),
+		      (PERF_COUNT_HW_CACHE_L1D) | (PERF_COUNT_HW_CACHE_OP_READ << 8) | (PERF_COUNT_HW_CACHE_RESULT_MISS << 16)
+  };
+
+
   int HW = PERF_TYPE_HARDWARE;
   int SW = PERF_TYPE_SOFTWARE;
+  int HW_C = PERF_TYPE_HW_CACHE;
   int type_array[] = {HW,
 		      HW,
 		      SW,
 		      SW,
 		      HW,
 		      HW,
-		      HW};
-  const int nStats = sizeof(conf_array)/sizeof(int);
-  const string conf_labels[nStats] = {"Branch misses.csv",
+		      HW,
+		      SW,
+		      SW,
+		      SW,
+		      HW_C,
+		      HW_C};
+  const int nStatsPerf = sizeof(conf_array)/sizeof(int);
+
+  const int nStatsTotal = nStatsPerf;
+  string conf_labels[nStatsTotal] = {"Branch misses.csv",
 				      "Instructions.csv",
 				      "Task clock.csv",
 				      "CPU clock.csv",
 				      "Cache refs.csv",
 				      "Cache misses.csv", 
-				      "Cpu cycles.csv"};
-  int fd_array[nStats];
-  perf_event_array(conf_array, type_array, fd_array, nStats);
+				      "Cpu cycles.csv",
+				      "Page faults.csv",
+				      "Page faults Non-IO.csv",
+				     "Page faults IO.csv",
+				     "Cache_L1D accesses.csv",
+				     "Cache_L1D misses.csv"};
 
-  long long stat_array[nAlgos][RUN_TIMES][nStats];
-	
+  int fd_array[nStatsPerf];
+  perf_event_array(conf_array, type_array, fd_array, nStatsPerf);
 
-  FILE *files[nStats];
-  {int i; for (i=0; i<nStats; i++) {
+  long long stat_array[nAlgos][RUN_TIMES][nStatsTotal];
+  
+
+  FILE *files[nStatsTotal];
+  {int i; for (i=0; i<nStatsTotal; i++) {
       files[i] = fopen((output_dir + "/" + conf_labels[i]).c_str(), "w");
       fprintf(files[i], "Array size,");
       int j; for (j=0; j<nAlgos; j++) {
@@ -102,70 +141,92 @@ int main(int argc, char **argv)
       fprintf(files[i], "\n");
     }}
 
-	int arrSize, low, high, searchFor;
+	int low, high, searchFor;
 	for (int i = 0; i < NUM_EXPERIMENTS; i++) {
-		//cout << "Experiment " << i << endl;
-		
+
 		// Create random array
-		arrSize = (i+1)*100;
+		const int arrSize = i*ARR_SIZE_SCALING + ARR_SIZE_OFFSET;
+
+		printf("Experiment %d/%d  \t Array size %g \n", (i+1), NUM_EXPERIMENTS, (double)arrSize);
 		
-		//cout << "Arrsize " << arrSize << endl;
-		
-		high = 100;
+		high = arrSize;
 		low = 1;
-		int array[arrSize];
+		//cout << "hello!"<< arrSize << endl;										
+		int* array = new int[arrSize];
+
 		fillArrayWithRandom(array, arrSize, low, high, i+1);
-		// Sort array
+		//Sort array
 		sort(array, array + arrSize);
-		
+
 		// Set up algorithms
 		{int i;
 		 for (i=0; i<nAlgos; i++) {
 		   (*algo_array[i]).createDataStructure(array, arrSize);
-		 }}
-		
-		// Repeat experiments
-		for (int j = 0; j < RUN_TIMES; j++) {
-			searchFor = getRandomNumber(low, high, INT_MAX - j);	
-			
-			int oldRes = -1;
-			int newRes;
-			
-			// Perform experiments
-			{int iAlg;
-			  for (iAlg=0; iAlg<nAlgos; iAlg++){
-			    perf_event_reset(fd_array, nStats);
-			    // Start all the stat-counters:
-			    perf_event_enable(fd_array, nStats);
+		   }}
 
-			    // Perform the binary search:
-			    newRes = (*algo_array[iAlg]).binSearch(searchFor);
 
-			    // Stop all the stat-counters:
-			    perf_event_disable(fd_array, nStats);
+		// Perform experiments
+		for (int iAlg=0; iAlg<nAlgos; iAlg++){
+		  
+		  // Repeat experiments
+		  for (int j = 0; j < RUN_TIMES; j++) {
+		    
+		    // TODO: this does not need to be done for every search, but it gives a more realistic measurement of cache refs and misses?
+		    // Set up algorithms
+		    /*{int i;
+		      for (i=0; i<nAlgos; i++) {
+		      (*algo_array[i]).createDataStructure(array, arrSize);
+		      }}*/
+		    
+		    searchFor = getRandomNumber(low, high, INT_MAX - j);	
+		    
+		    int oldRes = -1;
+		    int newRes;
+		    
+		    //chrono::high_resolution_clock::time_point start;
+		    //chrono::high_resolution_clock::time_point finish;
+		    
+		    // reset the clock
+		    //long start, finish;
+		    startTime.tv_sec = 0;
+		    startTime.tv_nsec = 0;
+		    endTime.tv_sec = 0;
+		    endTime.tv_nsec = 0;
+		    
+		    perf_event_reset(fd_array, nStatsPerf);
+		    // Start all the stat-counters:
+		    perf_event_enable(fd_array, nStatsPerf);
 			    
-			    // Check result
-			    if (oldRes != -1 && oldRes != newRes) {
-					printf("Wrong result. prev:%s %d, new:%s %d, ArrSize %d, searchFor %d\n", 
-						algo_labels[iAlg-1], oldRes, algo_labels[iAlg], newRes, arrSize, searchFor); 
+		    // Perform the binary search:
+		    newRes = (*algo_array[iAlg]).binSearch(searchFor);
+		    
+		    
+		    // Stop all the stat-counters:
+		    perf_event_disable(fd_array, nStatsPerf);
+		    
+		    // Check result
+		    if (oldRes != -1 && oldRes != newRes) {
+		      printf("Wrong result. prev:%s %d, new:%s %d, ArrSize %d, searchFor %d\n", 
+		      algo_labels[iAlg-1], oldRes, algo_labels[iAlg], newRes, arrSize, searchFor); 
+		      
+		      printf("Arr: [");
+		      for (int k=0; k < arrSize; k++) {
+		      printf("%d,", array[k]);
+		      }
+		      printf("]\n");
 					
-					printf("Arr: [");
-					for (int k=0; k < arrSize; k++) {
-						printf("%d,", array[k]);
-					}
-					printf("]\n");
-									
-				}
-				oldRes = newRes;
-			    
-			    //printf("iAlg=%d done", iAlg); // TODO: remove print
-			    // Store the stats in the stat_array
-			    read_all(stat_array[iAlg][j], fd_array, nStats);
-			  }}
+		      }
+		      oldRes = newRes;
+		    
+		    //printf("iAlg=%d done", iAlg); // TODO: remove print
+		    // Store the stats in the stat_array
+		    read_all(stat_array[iAlg][j], fd_array, nStatsPerf);
+		    
+		  }
 		}
-
-		// Loop through all the implementations and calculate the average of every stat for searches with this array size.
-		{for (int iStat = 0; iStat<nStats; iStat++){
+	
+	// Loop through all the implementations and calculate the average of every stat for searches with this array size.
+		{for (int iStat = 0; iStat<nStatsTotal; iStat++){
 		    fprintf(files[iStat], "%d,",arrSize);
 		    for (int iAlg=0; iAlg<nAlgos; iAlg++){
 		      long long stat_sum = 0;
@@ -173,15 +234,32 @@ int main(int argc, char **argv)
 			stat_sum += stat_array[iAlg][j][iStat];
 			//cout << stat_sum << endl;
 		      }
-		      long long stat_avg = stat_sum / RUN_TIMES;
-		      fprintf(files[iStat], "%lld,", stat_avg);
+		      //TODO: go back to dividing? done...
+		      double stat_avg = stat_sum / RUN_TIMES;
+		      fprintf(files[iStat], "%g,", stat_avg);
 		    }
 			fprintf(files[iStat], "\n");
 		  }}
+
+		delete [] array;
+		array = NULL;
 	}
 	
 	// TODO: Perhaps close the fd_array and files...
 	return 0;
+}
+
+timespec diff(timespec start, timespec end)
+{
+	timespec temp;
+	if ((end.tv_nsec-start.tv_nsec)<0) {
+		temp.tv_sec = end.tv_sec-start.tv_sec-1;
+		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+	} else {
+		temp.tv_sec = end.tv_sec-start.tv_sec;
+		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
+	}
+	return temp;
 }
 
 int getRandomNumber(int low, int high, int seed) {
@@ -237,37 +315,37 @@ int make_perf_event(int conf, int type){
   return fd;
 }
 
-void perf_event_array(int conf_array[], int type_array[], int* fd_array, int nStats){
+void perf_event_array(int conf_array[], int type_array[], int* fd_array, int nStatsPerf){
   int i;
-  for (i=0; i<nStats; i++) {
+  for (i=0; i<nStatsPerf; i++) {
     fd_array[i] = make_perf_event(conf_array[i], type_array[i]);
   }
 }
 
-void perf_event_reset(int fd_array[], int nStats){
+void perf_event_reset(int fd_array[], int nStatsPerf){
   int i;
-  for (i=0; i<nStats; i++) {
+  for (i=0; i<nStatsPerf; i++) {
     ioctl(fd_array[i], PERF_EVENT_IOC_RESET, 0);
   }
 }
 
-void perf_event_enable(int fd_array[], int nStats){
+void perf_event_enable(int fd_array[], int nStatsPerf){
   int i;
-  for (i=0; i<nStats; i++) {
+  for (i=0; i<nStatsPerf; i++) {
     ioctl(fd_array[i], PERF_EVENT_IOC_ENABLE, 0);
   }
 }
 
-void perf_event_disable(int fd_array[], int nStats){
+void perf_event_disable(int fd_array[], int nStatsPerf){
   int i;
-  for (i=0; i<nStats; i++) {
+  for (i=0; i<nStatsPerf; i++) {
     ioctl(fd_array[i], PERF_EVENT_IOC_DISABLE, 0);
   }
 }
 
-void read_all(long long stat_row[], int* fd_array, int nStats){
+void read_all(long long stat_row[], int* fd_array, int nStatsPerf){
   int i;
-  for (i=0; i<nStats; i++){
+  for (i=0; i<nStatsPerf; i++){
     long long stat = 0;
     read(fd_array[i], &stat, sizeof(long long));
     stat_row[i] = stat;
