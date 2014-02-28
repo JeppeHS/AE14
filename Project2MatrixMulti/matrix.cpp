@@ -1,5 +1,9 @@
 
 #include "matrix.h"
+#include <stdio.h>
+#include <iostream>
+using namespace std;
+
 
 matrix* createMatrix(int nRows, int nCols)
 {
@@ -24,7 +28,16 @@ void matrixPut(matrix* m, int i, int j, double value)
   assert(0<=i && i<(*m).nRows);
   assert(0<=j && j<(*m).nCols);
   int indx = i*(*m).nCols+j;
+  
   (*m).data[indx]=value;
+}
+
+void matrixAdd(matrix* m, int i, int j, double value){
+  assert(0<=i && i<(*m).nRows);
+  assert(0<=j && j<(*m).nCols);
+  
+  int indx = i*(*m).nCols+j;
+  (*m).data[indx]+=value;
 }
 
 double matrixGet(matrix* m, int i, int j) 
@@ -34,4 +47,3 @@ double matrixGet(matrix* m, int i, int j)
   int indx = i*(*m).nCols+j;
   return (*m).data[indx];
 }
-

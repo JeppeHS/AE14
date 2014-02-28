@@ -1,5 +1,6 @@
 #include "PerfStatClass.h"
 #include "TileMulti.h"
+#include "RecMulti.h"
 #include "matrix.h"
 
 using std::cout;
@@ -8,10 +9,33 @@ using std::endl;
 int main(int argc, char **argv)
 {
 	TileMulti tm = TileMulti();
-	matrix* A = createMatrix(10, 10);
-	matrix* B = createMatrix(10, 10);
-	tm.setup(A, 10, 10);
-	matrix* C = tm.matrixMultiplication(B);
+	RecMulti rec = RecMulti();
+
+	int m = 2;
+	int n = 3;
+	int p = 2;
+	matrix* A = createMatrix(m, n);
+	matrixPut(A, 0,0, 1);
+	matrixPut(A, 0,1, 1);
+	matrixPut(A, 1,0, 1);
+	matrixPut(A, 1,1, 1);
+	matrixPut(A, 0,2, 1);
+	matrixPut(A, 1,2, 1);
+
+	matrix* B = createMatrix(n, p);
+	matrixPut(B, 0,0, 1);
+	matrixPut(B, 0,1, 1);
+	matrixPut(B, 1,0, 1);
+	matrixPut(B, 1,1, 1);
+	matrixPut(B, 2,0, 1);
+	matrixPut(B, 2,1, 1);
+
+	rec.setup(A, m, n);
+	matrix* C = rec.matrixMultiplication(B);
+
+	matrixPrint(A);
+	matrixPrint(B);
+	matrixPrint(C);
 
 
   PerfStatClass perf = PerfStatClass();
@@ -28,13 +52,13 @@ int main(int argc, char **argv)
   const int nStats = perf.getNumberOfStats();
   long long stats[nStats];
   perf.read_all(stats);
-  for (int i=0; i<nStats; i++){
+  /*for (int i=0; i<nStats; i++){
     cout<<stats[i]<<endl;
   }
 
   long long time = perf.getTimeDiff();
 
-  cout << time << endl;
+  cout << time << endl;*/
   
   return 0;
 }
