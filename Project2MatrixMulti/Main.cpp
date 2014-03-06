@@ -11,7 +11,8 @@ void fillMatrixWithRandomNumbers(matrix* mat, int low, int high, int seed);
 int main(int argc, char **argv)
 {
 	TileMulti tm = TileMulti();
-	RecMulti rec = RecMulti();
+	/*
+  RecMulti rec = RecMulti();
 
 	int m = 1;
 	int n = 3;
@@ -33,7 +34,23 @@ int main(int argc, char **argv)
 	matrixPrint(A);
 	matrixPrint(B);
 	matrixPrint(C);
+  */
 
+  int low = 1;
+  int high = 1;
+  int matSize = 10;
+  matrix* A = createMatrix(matSize, matSize);
+  fillMatrixWithRandomNumbers(A, low, high, 234235);
+  matrix* B = createMatrix(matSize, matSize);
+  fillMatrixWithRandomNumbers(B, low, high, 787988);
+
+  matrixPrint(A);
+  matrixPrint(B);
+
+  TileMulti tm = TileMulti();
+  tm.setup(A, 0, 0);
+  matrix* C = tm.matrixMultiplication(B);
+  matrixPrint(C);
 
   PerfStatClass perf = PerfStatClass();
 

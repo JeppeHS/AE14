@@ -49,13 +49,15 @@ int matrixGet(matrix* m, int i, int j)
 }
 
 void matrixPrint(matrix* m) {
-  printf("Matrix:\n");  
-  for (int i = 0; i < m->nRows; i++) {
-    printf("[ %d ", matrixGet(m,i,0));
-    for (int j = 1; j < m->nCols; j++) {
-      printf("| %d ", matrixGet(m, i, j));
+  for (int i = 0; i < m->nCols; i++) {
+    printf("[ ");
+    for (int j = 0; j < m->nRows; j++) {
+      printf("%d", matrixGet(m, i, j));
+      if (j != m->nRows - 1) {
+         printf(" | ");
+      }
     }
-    printf("]\n");
+    printf(" ]\n");
   }
   printf("\n");
 }
