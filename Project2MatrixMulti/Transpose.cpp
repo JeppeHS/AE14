@@ -19,7 +19,7 @@ matrix* Transpose::transpose(matrix* B, int rows, int cols){
     {
        for ( int j = 0; j < cols; j++ )
        {
-		   matrixPut(result, i, j, matrixGet(B, j, i));
+		   matrixPut(result, j, i, matrixGet(B, i, j));
 		   //std::cout << matrixGet(result, i, j) << " ";
        }
 	   //std::cout << "\n";
