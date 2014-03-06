@@ -13,16 +13,11 @@ int main(int argc, char **argv)
 	TileMulti tm = TileMulti();
 	RecMulti rec = RecMulti();
 
-	int m = 2;
+	int m = 1;
 	int n = 3;
-	int p = 2;
+	int p = 1;
 	matrix* A = createMatrix(m, n);
-	matrixPut(A, 0,0, 1);
-	matrixPut(A, 0,1, 1);
-	matrixPut(A, 1,0, 1);
-	matrixPut(A, 1,1, 1);
-	matrixPut(A, 0,2, 1);
-	matrixPut(A, 1,2, 1);
+	//fillMatrix
 
 	matrix* B = createMatrix(n, p);
 	matrixPut(B, 0,0, 1);

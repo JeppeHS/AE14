@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "RecMulti.h"
+#include "matrix.h"
 
 using namespace std;
 
@@ -43,7 +44,7 @@ matrix * RecMulti::matrixMultiplication(matrix* matrixB)
 
 void recMult(int i_A, int j_A, int i_B, int j_B, int m, int n, int p) {
   if (m==1 && n==1 && p==1) { // base case
-    double AB = matrixGet(A, i_A, j_A)*matrixGet(B, i_B, j_B);
+    int AB = matrixGet(A, i_A, j_A)*matrixGet(B, i_B, j_B);
     matrixAdd(C, i_A, j_B, AB);
   } else if (m >= max(n,p)) { // split rows of A
     recMult(i_A,     j_A,     i_B,     j_B,     m/2,   n,     p    );

@@ -2,6 +2,7 @@ set datafile separator ","
 
 set terminal png
 set xlabel "Array size"
+set logscale x
 
 nAlgos = 5
 
@@ -47,13 +48,13 @@ set output "Page faults IO.png"
 set ylabel "#page faults IO"
 plot for [i=2:nAlgos+1] 'Page faults IO.csv' using 1:i with lines
 
-set output "Cache_L1D accesses.png"
-set ylabel "#Cache_L1D accesses"
-plot for [i=2:nAlgos+1] 'Cache_L1D accesses.csv' using 1:i with lines
+#set output "Cache_L1D accesses.png"
+#set ylabel "#Cache_L1D accesses"
+#plot for [i=2:nAlgos+1] 'Cache_L1D accesses.csv' using 1:i with lines
 
-set output "Cache_L1D misses.png"
-set ylabel "#Cache_L1D misses"
-plot for [i=2:nAlgos+1] 'Cache_L1D misses.csv' using 1:i with lines
+#set output "Cache_L1D misses.png"
+#set ylabel "#Cache_L1D misses"
+#plot for [i=2:nAlgos+1] 'Cache_L1D misses.csv' using 1:i with lines
 
 set output "Time.png"
 set ylabel "Time in ns"

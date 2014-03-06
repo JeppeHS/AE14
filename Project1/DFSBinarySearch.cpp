@@ -66,7 +66,9 @@ int DFSBinarySearch::binSearch(int elem)
 		} else if (atDepth == treeHeight) {
 			if (val < elem) {
 				return val;
-			}	
+			} else {  // Added by Lau. Before, if elem<val at the bottom of the tree, it would begin incrementing the node, making it a linear search!!
+			  return maxVal;
+			}
 					
 		} else if ( elem < val ) {
 			// Go left

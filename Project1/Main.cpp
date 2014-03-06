@@ -26,11 +26,14 @@
 
 using namespace std;
 
-const int NUM_EXPERIMENTS = 100;
+const int NUM_ORDERS = 6;
+const int RUNS_PER_ORDER = 10;
+
+const int NUM_EXPERIMENTS = NUM_ORDERS*RUNS_PER_ORDER;
 const int RUN_TIMES = 1000;
-const int ARR_SIZE_SCALING = 1501;
-const int ARR_SIZE_OFFSET = 50000;
-const int MEM_MAX = 1000000000;
+//const int ARR_SIZE_SCALING = 1001;
+//const int ARR_SIZE_OFFSET = 100;
+const int MEM_MAX = 2000000000;
 
 
 timespec diff(timespec start, timespec end);
@@ -61,14 +64,15 @@ int main(int argc, char **argv)
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
   vEBBinarySearch veb = vEBBinarySearch();
-  BinSearchInterface *algo_array[] = {&inorder, &bfs, &veb, &dfs};  // <-- Choose the implementations to run.
+  BinSearchInterface *algo_array[] = {&ls, &inorder, &dfs, &bfs, &veb};  // <-- Choose the implementations to run.
   const int nAlgos = sizeof(algo_array)/sizeof(BinSearchInterface*);
   const char *algo_labels[nAlgos] = {};
   for (int i=0; i<nAlgos; i++) {
     algo_labels[i] = (*algo_array[i]).getLabel();
   }
 
-  double memReq = (double)((nAlgos*NUM_EXPERIMENTS*ARR_SIZE_SCALING + ARR_SIZE_OFFSET)*sizeof(int));
+  //double memReq = (double)((nAlgos*NUM_EXPERIMENTS*ARR_SIZE_SCALING + ARR_SIZE_OFFSET)*sizeof(int));
+  double memReq = nAlgos*pow(10,NUM_ORDERS)*sizeof(int);
   printf("The following runs will use up to %g bytes of memory.\n",memReq);
   if (memReq > MEM_MAX) {
     printf("... which is more than the maximum limit set (%ld). Aborting.\n", MEM_MAX);
@@ -148,8 +152,12 @@ int main(int argc, char **argv)
 	int low, high, searchFor;
 	for (int i = 0; i < NUM_EXPERIMENTS; i++) {
 
+	  const int order = i / RUNS_PER_ORDER;
+	  cout << order << endl;
+	  const int run_number = (i % RUNS_PER_ORDER)+1;
 		// Create random array
-		const int arrSize = i*ARR_SIZE_SCALING + ARR_SIZE_OFFSET;
+	  //const int arrSize = i*ARR_SIZE_SCALING+1 + ARR_SIZE_OFFSET;
+	  const int arrSize = (int) pow(10,order) + (pow(10,order+1)-pow(10,order))*run_number/RUNS_PER_ORDER;
 
 		printf("Experiment %d/%d  \t Array size %g \n", (i+1), NUM_EXPERIMENTS, (double)arrSize);
 		
