@@ -61,3 +61,22 @@ void matrixPrint(matrix* m) {
   }
   printf("\n");
 }
+
+bool matrixEquals(matrix* m1, matrix* m2) {
+  if (m1->nRows != m2->nRows || m1->nCols != m2->nCols) {
+    return false;
+  } 
+
+  for (int i = 0; i < m1->nRows; i++) {
+    for (int j = 0; j < m1->nCols; j++) {
+      if (matrixGet(m1, i, j) != matrixGet(m2, i, j)) {
+        return false;
+      }
+    }  
+  }
+
+  return true;
+}
+
+
+
