@@ -18,7 +18,7 @@ matrix * NaiveMatrixMulti::matrixMultiplication(matrix* B){
 	{
 		for(int col=0; col<(*B).nCols; col++)
 		{
-			double value = 0;
+			int value = 0;
 			// Multiply the row of A by the column of B to get the row, column of product.
 			for (int inner = 0; inner < (*mA).nCols; inner++) {
 				value += matrixGet(mA, row, inner) * matrixGet(B, inner, col);
