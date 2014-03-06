@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   BFSBinarySearch bfs = BFSBinarySearch();
   DFSBinarySearch dfs = DFSBinarySearch();
   vEBBinarySearch veb = vEBBinarySearch();
-  BinSearchInterface *algo_array[] = {&ls, &inorder, &dfs, &bfs, &veb};  // <-- Choose the implementations to run.
+  BinSearchInterface *algo_array[] = {&inorder, &dfs, &bfs, &veb};  // <-- Choose the implementations to run.
   const int nAlgos = sizeof(algo_array)/sizeof(BinSearchInterface*);
   const char *algo_labels[nAlgos] = {};
   for (int i=0; i<nAlgos; i++) {
