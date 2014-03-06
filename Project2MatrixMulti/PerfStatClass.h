@@ -47,7 +47,7 @@ void endTimeNow();
 
   static int HW = PERF_TYPE_HARDWARE;
   static int SW = PERF_TYPE_SOFTWARE;
-  static int HW_C = PERF_TYPE_HW_CACHE;
+//static int HW_C = PERF_TYPE_HW_CACHE;
   static int type_array[] = {HW,
 		      HW,
 		      SW,
@@ -89,6 +89,10 @@ class PerfStatClass{
 
   int getNumberOfStats() {
     return nStats;
+  }
+  
+  std::string getConfLabel(int index){
+  	return conf_labels[index];
   }
 
   void startTimeNow(){

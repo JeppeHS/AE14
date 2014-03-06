@@ -2,8 +2,8 @@
 #include "NaiveMatrixMulti.h"
 
 using namespace std;
-matrix * mA;
-matrix * product;
+static matrix * mA;
+static matrix * product;
 
 NaiveMatrixMulti::NaiveMatrixMulti(){
 }
