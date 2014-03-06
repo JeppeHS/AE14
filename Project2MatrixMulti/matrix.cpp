@@ -27,7 +27,8 @@ void matrixPut(matrix* m, int i, int j, int value)
 {
   assert(0<=i && i<(*m).nRows);
   assert(0<=j && j<(*m).nCols);
-  int indx = i*(*m).nCols+j;
+  //int indx = i*(*m).nCols+j;
+  int indx = j*(*m).nRows+i;
   
   (*m).data[indx]=value;
 }
@@ -36,7 +37,8 @@ void matrixAdd(matrix* m, int i, int j, int value){
   assert(0<=i && i<(*m).nRows);
   assert(0<=j && j<(*m).nCols);
   
-  int indx = i*(*m).nCols+j;
+  //int indx = i*(*m).nCols+j;
+  int indx = j*(*m).nRows+i;
   (*m).data[indx]+=value;
 }
 
@@ -44,7 +46,8 @@ int matrixGet(matrix* m, int i, int j)
 {
   assert(0<=i && i<(*m).nRows);
   assert(0<=j && j<(*m).nCols);
-  int indx = i*(*m).nCols+j;
+  //int indx = i*(*m).nCols+j;
+  int indx = j*(*m).nRows+i;
   return (*m).data[indx];
 }
 
