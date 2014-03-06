@@ -31,7 +31,12 @@ int main(int argc, char **argv)
     algo_labels[i] = (*algo_array[i]).getLabel();
     }*/
 
+	rec.setup(A, m, n);
+	matrix* C = rec.matrixMultiplication(B);
 
+	matrixPrint(A);
+	matrixPrint(B);
+	matrixPrint(C);
 
   FILE *files[nStats];
   {int i; for (i=0; i<nStats; i++) {
@@ -55,6 +60,7 @@ int main(int argc, char **argv)
     const int dim_n = dim_m;
     const int matSize = dim_m * dim_n; // TODO: something else...
 
+  perf.startTimeNow();
 
     matrix* matrix_A = createMatrix(dim_m, dim_n); // <-- TODO
 

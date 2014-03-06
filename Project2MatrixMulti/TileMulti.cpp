@@ -5,7 +5,12 @@
 
 using namespace std;
 
-matrix* mA;
+static int s = 2;
+static matrix* A;
+static matrix* B;
+static matrix* C;
+
+void multiplyMatrix(int ArowOffset, int AcolOffset, int BrowOffset, int BcolOffset, int CrowOffset, int CcolOffset, int size); 
 
 TileMulti::TileMulti() 
 {
@@ -15,23 +20,67 @@ TileMulti::~TileMulti()
 {
 }
 
-void TileMulti::setup(matrix* A, int height, int width) 
+void TileMulti::setup(matrix* matA, int height, int width) 
 {
-	mA = A;
+	A = matA;
 }
 
-matrix * TileMulti::matrixMultiplication(matrix* B)
+matrix * TileMulti::matrixMultiplication(matrix* matB)
 {
-	// Create output matrix
-	matrix* C = createMatrix((*B).nRows, (*mA).nCols);	
-	printf("Initialized output matrix with %d rows and %d cols\n", (*C).nRows, (*C).nCols);
+	B = matB;
 	
+	// Create output matrix
+	C = createMatrix(B->nRows, A->nCols);	
+	
+	// Debug
+	//printf("Initialized output matrix with %d rows and %d cols\n", C->nRows, C->nCols);
 
+	// Assume that both intput matrices is n x n 
+	int n = B->nRows;
+	int sizeOfSubMat = n/s; 
 
+	// Algorithm
+	int ixSize, jxSize, kxSize;
+	for (int i = 0; i < s; i++) {
+		for (int j = 0; j < s; j++) {
+			for (int k = 0; k < s; k++) {
+						
+				// Debug
+				//printf("Run: i: %d, j: %d, k: %d\n", i, j, k);		
 
-	matrixPut(C, 1, 1, 12);
-
-	printf("Get 1,1 : %d\n", matrixGet(C, 1, 1));
+				ixSize = i*sizeOfSubMat;
+				jxSize = j*sizeOfSubMat;
+				kxSize = k*sizeOfSubMat;
+			 	multiplyMatrix(ixSize, kxSize, kxSize, jxSize, ixSize, jxSize, sizeOfSubMat);
+			}
+		}
+	}		
 
 	return C;
 }
+
+void multiplyMatrix(int ArowOffset, int AcolOffset, int BrowOffset, int BcolOffset, int CrowOffset, int CcolOffset, int size)
+{
+ 	// Debug
+ 	/*
+ 	printf("multiply called. size: %d\n", size);
+ 	printf("ArowOffset %d, AcolOffset %d, BrowOffset %d, BcolOffset %d, CrowOffset %d, CcolOffset %d\n", 
+ 		ArowOffset, AcolOffset, BrowOffset, BcolOffset, CrowOffset, CcolOffset);
+	*/
+
+	int accuRes = 0;
+	for (int Arow = 0; Arow < size; Arow++) {
+		for (int Bcol = 0; Bcol < size; Bcol++) {
+			
+			//Calculate C (Arow, Bcol)
+			for (int Acol = 0; Acol < size; Acol++) {
+				accuRes += matrixGet(A, Arow + ArowOffset, Acol + AcolOffset)*matrixGet(B, Acol + BrowOffset, Bcol + BcolOffset);
+			}
+			matrixAdd(C, Arow + CrowOffset, Bcol + CcolOffset, accuRes);
+			accuRes = 0;
+		}		
+	}
+}
+
+
+
