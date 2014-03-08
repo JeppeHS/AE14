@@ -5,12 +5,12 @@
 
 using namespace std;
 
-static int s = 2;
+static int s = 4;
 static matrix* A;
 static matrix* B;
 static matrix* C;
 
-void multiplyMatrix(int ArowOffset, int AcolOffset, int BrowOffset, int BcolOffset, int AnRows, int AnCols, int BnRows, int BnCols);
+void multiplyMatrix(int ArowOffset, int AcolOffset, int BcolOffset, int AnRows, int AnCols, int BnCols);
 
 TileMulti::TileMulti() 
 {
@@ -33,16 +33,14 @@ matrix * TileMulti::matrixMultiplication(matrix* matB)
 	C = createMatrix(A->nRows, B->nCols);	
 
 	// Debug
-	printf("Initialized output matrix with %d rows and %d cols\n", C->nRows, C->nCols);
+	//printf("Initialized output matrix with %d rows and %d cols\n", C->nRows, C->nCols);
 
 	if (A->nRows < s || B->nCols < s) { s = 1; }	// If can't split matrix 
 
-
 	// Algorithm
-	int subAnRows, subAnCols, subBnRows, subBnCols;
+	int subAnRows, subAnCols, subBnCols;
 	int rowsVisitedA = 0;
 	int colsVisitedA = 0;
-	int rowsVisitedB = 0;
 	int colsVisitedB = 0;
 
 	for (int i = 0; i < s; i++) {
@@ -50,13 +48,11 @@ matrix * TileMulti::matrixMultiplication(matrix* matB)
 		subAnRows = ceil( (double) (A->nRows - rowsVisitedA) / (double) (s - i) );
 
 		for (int j = 0; j < s; j++) {
-			rowsVisitedB = 0;
 			colsVisitedA = 0;
 			subBnCols = ceil( (double) (B->nCols - colsVisitedB) / (double) (s - j) );
 
 			for (int k = 0; k < s; k++) {
 				subAnCols = ceil( (double) (A->nCols - colsVisitedA) / (double) (s - k) );
-			 	subBnRows = ceil( (double) (B->nRows - rowsVisitedB) / (double) (s - k) );
 
 				// Debug
 				/*
@@ -65,10 +61,9 @@ matrix * TileMulti::matrixMultiplication(matrix* matB)
 				printf("rowsVisitedA %d, colsVisitedA %d, rowsVisitedB %d, colsVisitedB %d\n", 
 					rowsVisitedA, colsVisitedA, rowsVisitedB, colsVisitedB);
 				*/
-				multiplyMatrix(rowsVisitedA, colsVisitedA, rowsVisitedB, colsVisitedB, subAnRows, subAnCols, subBnRows, subBnCols);
+				multiplyMatrix(rowsVisitedA, colsVisitedA, colsVisitedB, subAnRows, subAnCols, subBnCols);
 
 			 	colsVisitedA += subAnCols;
-			 	rowsVisitedB += subBnRows;
 			}
 			colsVisitedB += subBnCols;	
 		}
@@ -78,7 +73,7 @@ matrix * TileMulti::matrixMultiplication(matrix* matB)
 	return C;
 }
 
-void multiplyMatrix(int ArowOffset, int AcolOffset, int BrowOffset, int BcolOffset, int AnRows, int AnCols, int BnRows, int BnCols)
+void multiplyMatrix(int ArowOffset, int AcolOffset, int BcolOffset, int AnRows, int AnCols, int BnCols)
 {
  	// Debug
  	/*
@@ -93,7 +88,7 @@ void multiplyMatrix(int ArowOffset, int AcolOffset, int BrowOffset, int BcolOffs
 			
 			//Calculate C (Arow, Bcol)
 			for (int Acol = 0; Acol < AnCols; Acol++) {
-				accuRes += matrixGet(A, Arow + ArowOffset, Acol + AcolOffset)*matrixGet(B, Acol + BrowOffset, Bcol + BcolOffset);
+				accuRes += matrixGet(A, Arow + ArowOffset, Acol + AcolOffset)*matrixGet(B, Acol + AcolOffset, Bcol + BcolOffset);
 			}
 			matrixAdd(C, Arow + ArowOffset, Bcol + BcolOffset, accuRes);
 			accuRes = 0;
