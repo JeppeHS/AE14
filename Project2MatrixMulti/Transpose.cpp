@@ -41,11 +41,11 @@ matrix* Transpose::matrixMultiplication(matrix* B){
 			}
 			matrixPut(p, colA, colB, value);
 			//Print
-			std::cout << matrixGet(p, colA, colB) << " ";
+			//std::cout << matrixGet(p, colA, colB) << " ";
 		}
 		//Print
-		std::cout << "\n";
+		//std::cout << "\n";
 	}
-	std::cout << "\n";
+	//std::cout << "\n";
 	return p;
 }

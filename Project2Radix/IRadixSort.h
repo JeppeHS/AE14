@@ -6,7 +6,7 @@
 class IRadixSort
 {
 public:
-	virtual void setup() = 0;
+	virtual void setup(int arrSize) = 0;
 	virtual int* sort(int* array, int arrSize) = 0;
 };
 
