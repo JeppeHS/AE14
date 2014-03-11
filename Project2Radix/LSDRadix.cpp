@@ -32,7 +32,7 @@ int* LSDRadix::sort(int* array, int arrSize)
 {
 	// Copy array
 	int* sortedArray = new int[arrSize];
-	memcpy(sortedArray, array, sizeof(int[arrSize]));
+	memcpy(sortedArray, array, sizeof(int[7]));
 
 	// Sort by number of lowest signifigent digits
 	for (int i = 0; i < SORT_BY_N_DIGITS; i++) {
