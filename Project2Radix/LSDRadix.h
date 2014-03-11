@@ -9,7 +9,7 @@ class LSDRadix : public IRadixSort
 public:
 	LSDRadix();
 	~LSDRadix();
-	void setup();
+	void setup(int arrSize);
 	int* sort(int* array, int arrSize);
 };
 

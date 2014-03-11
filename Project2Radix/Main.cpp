@@ -1,29 +1,35 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <algorithm>
 
 #include "LSDRadix.h"
+#include "MultiCoreRadix.h"
 
 void fillArrayWithRandom(int * array, int size, int low, int high, int seed);
 void printArray(int* array, int arrSize);
 
 int main(int argc, char **argv)
 {
-  int arrSize = 10;
+  int arrSize = 20;
   int* array = new int[arrSize];  
-  fillArrayWithRandom(array, arrSize, 100, 999, 555);
+  fillArrayWithRandom(array, arrSize, pow(2, 24), pow(2, 31), 555);
 
   printf("Input array:\n");
   printArray(array, arrSize);
 
+  /*
   LSDRadix lsd = LSDRadix();
-
-  lsd.setup();
-
   int* sortedArray = lsd.sort(array, arrSize);
+  */
+  MultiCoreRadix mcr = MultiCoreRadix();
+  mcr.setup(arrSize);
+  int* sortedArray = mcr.sort(array, arrSize);
 
   printf("Sorted array:\n");
   printArray(sortedArray, arrSize);
+
+
 
   return 0;
 }

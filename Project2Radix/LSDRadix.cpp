@@ -14,7 +14,6 @@ using namespace std;
 
 queue<int> buckets[NUM_BASE];
 
-
 LSDRadix::LSDRadix() 
 {
 }
@@ -23,9 +22,8 @@ LSDRadix::~LSDRadix()
 {
 }
 
-void LSDRadix::setup()
+void LSDRadix::setup(int arrSize)
 {
-	
 }
 
 int* LSDRadix::sort(int* array, int arrSize)
@@ -37,10 +35,11 @@ int* LSDRadix::sort(int* array, int arrSize)
 	// Sort by number of lowest signifigent digits
 	for (int i = 0; i < SORT_BY_N_DIGITS; i++) {
 
+		int powI = pow(10, i);
 		for (int j = 0; j < arrSize; j++) {
 			// Add to bucket
-			// sortedArray[j] / (int) pow(10, i) gets the i'th digit from the right
-			buckets[ ( sortedArray[j] / (int) pow(10, i) ) % NUM_BASE].push(sortedArray[j]);
+			// sortedArray[j] / powI gets the i'th digit from the right
+			buckets[ ( sortedArray[j] / powI ) % NUM_BASE].push(sortedArray[j]);
 		}	
 
 		// Create sorted array from buckets
