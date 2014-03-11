@@ -145,9 +145,9 @@ int* MultiCoreRadix::sort(int* array, int arrSize)
 
 		tInfos1[i].threadNum = i;
 		// From and including start index
-		tInfos1[i].msdBucketStart = i*sizeSubArrs;									
+		tInfos1[i].msdBucketStart = i*nBucketsForEachThread;									
 		// Up to and excluding end index
-		tInfos1[i].endIdx = min( tInfos1[i].startIdx + sizeSubArrs, arrSize);	
+		tInfos1[i].msdBucketEnd = min( tInfos1[i].msdBucketStart + nBucketsForEachThread, nBuckets);	
 
    		threadRes = pthread_create(&threads[i], NULL, parallelTask2, (void *) &tInfos2[i]);
     	if (threadRes) {
