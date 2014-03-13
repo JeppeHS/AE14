@@ -137,19 +137,17 @@ int* MultiCoreRadix::sort(int* array, int arrSize)
 	}
 	printf("Part 2 done\n");
 
-	// Part 3 - Parallel: The rest, LSD 
+	// Part 3 - Parallel: The rest, LSD
+	int nBucketsForEachThread = nBuckets / NUM_OF_THREADS;
 	int* sortedArray = new int[arrSize];
-	int threadRes;
 	for (int i = 0; i < NUM_OF_THREADS; i++) {
 		printf("Creating thread %d\n", i);
 
-		/*
 		tInfos1[i].threadNum = i;
 		// From and including start index
-		tInfos1[i].msdBucketStart = i*sizeSubArrs;									
+		tInfos1[i].msdBucketStart = i*nBucketsForEachThread;									
 		// Up to and excluding end index
-		tInfos1[i].endIdx = min( tInfos1[i].startIdx + sizeSubArrs, arrSize);	
-		*/
+		tInfos1[i].msdBucketEnd = min( tInfos1[i].msdBucketStart + nBucketsForEachThread, nBuckets);	
 
    		threadRes = pthread_create(&threads[i], NULL, parallelTask2, (void *) &tInfos2[i]);
     	if (threadRes) {
@@ -158,7 +156,6 @@ int* MultiCoreRadix::sort(int* array, int arrSize)
    	 	}
 	}		
 	// Join threads
-	int status;
 	for (int i = 0; i < NUM_OF_THREADS; i++) {
 		pthread_join(threads[i], (void**)&status);
 	}
