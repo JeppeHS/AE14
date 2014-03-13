@@ -87,7 +87,7 @@ int* MultiCoreRadix::sort(int* array, int arrSize)
 void parallelMSDCountingSort()
 {
 	int threadRes;
-	int sizeSubArrs = arraySize / NUM_OF_THREADS;
+	int sizeSubArrs = ceil(arraySize / NUM_OF_THREADS);
 	for (int i = 0; i < NUM_OF_THREADS; i++) {
 		//printf("Creating thread %d\n", i);
 
@@ -95,10 +95,12 @@ void parallelMSDCountingSort()
 		// From and including start index
 		tInfos1[i].startIdx = i*sizeSubArrs;									
 		// Up to and excluding end index
-		tInfos1[i].endIdx = min( tInfos1[i].startIdx + sizeSubArrs, arraySize);	
+		tInfos1[i].endIdx = min(tInfos1[i].startIdx + sizeSubArrs, arraySize);	
 		// Number of assigned elements
 		nElemsAssigned[i] = tInfos1[i].endIdx - tInfos1[i].startIdx;
 		// Initialize bucket array for thread
+		delete [] threadBucketArrays[i];
+		delete [] threadNextArrays[i];
 		threadBucketArrays[i] = new int[nBuckets * nElemsAssigned[i]];	
 		threadNextArrays[i] = new int[nBuckets]();
 
@@ -141,7 +143,7 @@ void serialComputeMSDOutputIndices()
 void parallelLSDSort()
 {
 	int threadRes;
-	int nBucketsForEachThread = nBuckets / NUM_OF_THREADS;
+	int nBucketsForEachThread = ceil(nBuckets / NUM_OF_THREADS);
 	for (int i = 0; i < NUM_OF_THREADS; i++) {
 		//printf("Creating thread %d\n", i);
 
@@ -212,12 +214,12 @@ static void *parallelTask2(void *arg)
 	struct threadInfo2 *tInfo = (struct threadInfo2 *) arg;
 	//printf("Task2 for %d started\n", tInfo->threadNum);
 
-	int* localBuckets = new int[nBuckets * arraySize]; 
-	int* localNextArr = new int[nBuckets]();
-	int* lastLSDhistogram = new int[nBuckets];
-	int* tmpBuckets = new int[nBuckets * arraySize];	
-	int* tmpNextArr = new int[nBuckets]();
-	int* d2prefixSum = new int[nBuckets];
+	int* buckets0 = new int[nBuckets * arraySize]; 
+	int* nexts0 = new int[nBuckets]();
+	int* histogram2 = new int[nBuckets];
+	int* buckets1 = new int[nBuckets * arraySize];	
+	int* nexts1 = new int[nBuckets]();
+	int* prefixSum2 = new int[nBuckets];
 
 	int shiftRight2nLast = PARAM_D;	
 	int shiftRightLast = 2*PARAM_D;
@@ -230,8 +232,10 @@ static void *parallelTask2(void *arg)
 		//printf("Thread %d look at msd bucket %d\n", tInfo->threadNum, msdBucket);
 		startIdxForMSDBucket = ouputMSDStartIndices[msdBucket];
 		
+		int incremented = 0;
+
 		// Reset	
-		fill(localNextArr, localNextArr + nBuckets, 0);
+		fill(nexts0, nexts0 + nBuckets, 0);
 
 		// First pass, sort assigned global buckets into local buckets based on the lowest D bits
 		// For each thread
@@ -246,31 +250,50 @@ static void *parallelTask2(void *arg)
 				// Put in this thread's local bucket
 				elem = threadBucketArray[bucketStartIdx + i];
 				putInBucket = elem & lsdBitMask;
-				localBuckets[putInBucket*arraySize + localNextArr[putInBucket]] = elem;
-				localNextArr[putInBucket]++;
+				buckets0[putInBucket*arraySize + nexts0[putInBucket]] = elem;
+			
+				incremented++;
+
+				nexts0[putInBucket]++;
 			}
 		}
 		//printf("Phase 1 for %d ended\n", tInfo->threadNum);
 		
+		/*
+		if (incremented > 0) {
+			printf("nexts0\n");
+			printArray2(nexts0, nBuckets);
+		}
+		*/
+
 		// DEBUG
-		//printLocalBucketArray(localBuckets, localNextArr, nBuckets, arraySize); 
+		//printLocalBucketArray(buckets0, nexts0, nBuckets, arraySize); 
+		//printf("Local next arr\n");
+		//printArray2(nexts0, nBuckets);
 
 		// TODO passes in between first and second to last
 
 		// Second to last pass: sort and make histogram
 
 		// Reset	
-		fill(tmpNextArr, tmpNextArr + nBuckets, 0);
-
+		fill(nexts1, nexts1 + nBuckets, 0);
+		fill(histogram2, histogram2 + nBuckets, 0);
 		// For each bucket and each element in said bucket
 		for (int bucket = 0; bucket < nBuckets; bucket++) {
-			for (int i = 0; i < localNextArr[bucket]; i++) {
+
+			/*
+			if (nexts0[bucket] > 0) {
+				printf("Bucket %d, nexts0[bucket] %d\n", bucket, nexts0[bucket]);
+			}
+			*/
+
+			for (int i = 0; i < nexts0[bucket]; i++) {
 				
-				elem = localBuckets[bucket*arraySize + i];
+				elem = buckets0[bucket*arraySize + i];
 
 				// DEBUG
 				/*
-				printf("2nd last phase: Elem: ");
+				printf("2nd last phase: b %d Elem: ", bucket);
 				printBinary(elem);
 				printf(", shifted elem: ");
 				printBinary((elem >> shiftRight2nLast));
@@ -278,46 +301,50 @@ static void *parallelTask2(void *arg)
 				printBinary((elem >> shiftRight2nLast) & lsdBitMask);
 				printf("\n");
 				*/
+				
 
 				// Put in bucket
 				putInBucket = (elem >> shiftRight2nLast) & lsdBitMask;
-				tmpBuckets[putInBucket*arraySize + tmpNextArr[putInBucket]] = elem;
-				tmpNextArr[putInBucket]++;
+				buckets1[putInBucket*arraySize + nexts1[putInBucket]] = elem;
+				nexts1[putInBucket]++;
 
 				// Histogram
 				histIdx = (elem >> shiftRightLast) & lsdBitMask;
-				lastLSDhistogram[histIdx]++;
+				histogram2[histIdx]++;
 			}
 		}
-		localBuckets = tmpBuckets;
-		localNextArr = tmpNextArr;
+		//buckets0 = buckets1;
+		//nexts0 = nexts1;
 
 		//printf("Phase 2 for %d ended\n", tInfo->threadNum);
 
-		d2prefixSum[0] = 0;		
+		prefixSum2[0] = 0;		
 		for (int i = 0; i < nBuckets; i++) {
 			// Prefix sum
 			if (i != nBuckets -1) {
-				d2prefixSum[i+1] = d2prefixSum[i] + lastLSDhistogram[i];
+				prefixSum2[i+1] = prefixSum2[i] + histogram2[i];
 			} 
 		}
 
 		// Last pass: write to output array
 		for (int bucket = 0; bucket < nBuckets; bucket++) {
-			for (int i = 0; i < localNextArr[bucket]; i++) {
+			for (int i = 0; i < nexts1[bucket]; i++) {
 				
-				elem = localBuckets[bucket*arraySize + i];
+				elem = buckets1[bucket*arraySize + i];
 
 				putInBucket = (elem >> shiftRightLast) & lsdBitMask;
 
-				outputIdx = startIdxForMSDBucket + d2prefixSum[putInBucket];
+				outputIdx = startIdxForMSDBucket + prefixSum2[putInBucket];
 
-				/*
-				printf("\tElem: %d, new bucket %d, d1Psum %d, d2Psum %d, output idx %d\n", elem, putInBucket, 
-						startIdxForMSDBucket, d2prefixSum[putInBucket], outputIdx);
-				*/
-
-				d2prefixSum[putInBucket]++;
+				
+				printf("\tElem: %d, new bucket %d, d3Psum %d, d2Psum %d, output idx %d\n", elem, putInBucket, 
+						startIdxForMSDBucket, prefixSum2[putInBucket], outputIdx);
+				printBinary(elem);
+				printf("\n");
+				
+				if (putInBucket < nBuckets -1) {
+					prefixSum2[putInBucket+1]++;
+				}
 				sortedArray[outputIdx] = elem;
 			}
 		}
