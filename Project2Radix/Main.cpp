@@ -10,7 +10,7 @@
 #include "MSDRadix.h"
 #include "MSDRadix_countSort.h"
 #include "CountingSort.h"
-//#include "MultiCoreRadix.h"
+#include "MultiCoreRadix.h"
 
 void fillArrayWithRandom(int * array, int size, int low, int high, int seed);
 void printArray(int* array, int arrSize);
@@ -22,10 +22,10 @@ using std::string;
 
 
 const int NUM_ORDERS = 6;
-const int RUNS_PER_ORDER = 10;
+const int RUNS_PER_ORDER = 1;
 
 const int NUM_EXPERIMENTS = NUM_ORDERS*RUNS_PER_ORDER;
-const int RUN_TIMES = 20;
+const int RUN_TIMES = 1000;
 const int SIZE_MIN = 10;
 
 const string output_dir = "Measurements";
@@ -36,14 +36,14 @@ int main(int argc, char **argv)
   MSDRadix msd = MSDRadix();
   MSDRadix_countSort msdCS = MSDRadix_countSort();
   CountingSort cs = CountingSort();
-  //MultiCoreRadix mcr = MultiCoreRadix();
+  MultiCoreRadix mcr = MultiCoreRadix();
 
   PerfStatClass perf = PerfStatClass();
   const int nStats = perf.getNumberOfStats();
 
-  IRadixSort *algo_array[] = {&msd, &msdCS};  // <-- Choose the implementations to run.
+  IRadixSort *algo_array[] = {&mcr, &msd};  // <-- Choose the implementations to run.
   const int nAlgos = sizeof(algo_array)/sizeof(IRadixSort*);
-  const char *algo_labels[nAlgos] = {"MSD", "MSD_cs"};
+  const char *algo_labels[nAlgos] = {"MCR", "MSD"};
   /*for (int i=0; i<nAlgos; i++) {
     algo_labels[i] = (*algo_array[i]).getLabel();
     }*/
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
     
     
     const int arrSize = size_exp + SIZE_MIN;
-    
+
     int* array = new int[arrSize];
 
     
@@ -113,7 +113,6 @@ int main(int argc, char **argv)
 	
 	fillArrayWithRandom(array, arrSize, low, high, seed);	
 
-
 	for (int iAlg=0; iAlg<nAlgos; iAlg++){
 
 	perf.perf_event_reset();
@@ -134,7 +133,7 @@ int main(int argc, char **argv)
 
 	
 	//printf("Sorted array:\n");
-	//printArray(newArray, arrSize);
+  //printArray(newArray, arrSize);
     
 	//long long time = perf.getTimeDiff();
 
