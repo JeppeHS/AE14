@@ -8,7 +8,7 @@ CountingSort::CountingSort(){}
 
 CountingSort::~CountingSort(){}
 
-void CountingSort::setup(){}
+void CountingSort::setup(int arrSize){}
 int* CountingSort::sort(int* array, int arrSize)
 {
 	int gKey = 0;
