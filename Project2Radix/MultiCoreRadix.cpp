@@ -87,7 +87,7 @@ int* MultiCoreRadix::sort(int* array, int arrSize)
 void parallelMSDCountingSort()
 {
 	int threadRes;
-	int sizeSubArrs = ceil(arraySize / NUM_OF_THREADS);
+	int sizeSubArrs = ceil((double) arraySize / NUM_OF_THREADS);
 	for (int i = 0; i < NUM_OF_THREADS; i++) {
 		//printf("Creating thread %d\n", i);
 
@@ -98,6 +98,7 @@ void parallelMSDCountingSort()
 		tInfos1[i].endIdx = min(tInfos1[i].startIdx + sizeSubArrs, arraySize);	
 		// Number of assigned elements
 		nElemsAssigned[i] = tInfos1[i].endIdx - tInfos1[i].startIdx;
+
 		// Initialize bucket array for thread
 		delete [] threadBucketArrays[i];
 		delete [] threadNextArrays[i];
@@ -143,7 +144,7 @@ void serialComputeMSDOutputIndices()
 void parallelLSDSort()
 {
 	int threadRes;
-	int nBucketsForEachThread = ceil(nBuckets / NUM_OF_THREADS);
+	int nBucketsForEachThread = nBuckets / NUM_OF_THREADS;
 	for (int i = 0; i < NUM_OF_THREADS; i++) {
 		//printf("Creating thread %d\n", i);
 
@@ -172,6 +173,7 @@ static void *parallelTask1(void *arg)
 {
 	struct threadInfo1 *tInfo = (struct threadInfo1 *) arg;
 	//printf("Task1 for %d started\n", tInfo->threadNum);
+
 	
 	// MSD counting sort 
 	int *bucketArray = threadBucketArrays[tInfo->threadNum];
@@ -336,15 +338,14 @@ static void *parallelTask2(void *arg)
 
 				outputIdx = startIdxForMSDBucket + prefixSum2[putInBucket];
 
-				
+				/*
 				printf("\tElem: %d, new bucket %d, d3Psum %d, d2Psum %d, output idx %d\n", elem, putInBucket, 
 						startIdxForMSDBucket, prefixSum2[putInBucket], outputIdx);
 				printBinary(elem);
 				printf("\n");
-				
-				if (putInBucket < nBuckets -1) {
-					prefixSum2[putInBucket+1]++;
-				}
+				*/
+
+				prefixSum2[putInBucket]++;				
 				sortedArray[outputIdx] = elem;
 			}
 		}
