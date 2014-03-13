@@ -8,7 +8,7 @@ class CountingSort : public IRadixSort
 public:
 	CountingSort();
 	~CountingSort();
-	void setup();
+	void setup(int arrSize);
 	int* sort(int* array, int arrSize);
 };
 
