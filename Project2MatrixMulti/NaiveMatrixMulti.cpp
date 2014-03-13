@@ -25,10 +25,10 @@ matrix * NaiveMatrixMulti::matrixMultiplication(matrix* B){
 			}
 			matrixPut(product, row, col, value);
 			//Print
-			std::cout << matrixGet(product, row, col) << " ";
+			//std::cout << matrixGet(product, row, col) << " ";
 		}
 		//Print
-		std::cout << "\n";
+		//std::cout << "\n";
 	}
 	//std::cout << "\n";
 	return product;
