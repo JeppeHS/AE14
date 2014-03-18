@@ -22,7 +22,7 @@ using std::endl;
 using std::string;
 
 
-const int NUM_ORDERS = 5;
+const int NUM_ORDERS = 4;
 const int RUNS_PER_ORDER = 10;
 
 const int NUM_EXPERIMENTS = NUM_ORDERS*RUNS_PER_ORDER;
@@ -43,9 +43,15 @@ int main(int argc, char **argv)
   PerfStatClass perf = PerfStatClass();
   const int nStats = perf.getNumberOfStats();
 
+<<<<<<< HEAD
   IRadixSort *algo_array[] = {&msd, &msdCS, &mcr};  // <-- Choose the implementations to run.
   const int nAlgos = sizeof(algo_array)/sizeof(IRadixSort*);
   const char *algo_labels[nAlgos] = {"MSD", "MSD_arr", "MCR"};
+=======
+  IRadixSort *algo_array[] = {&mcr, &msd};  // <-- Choose the implementations to run.
+  const int nAlgos = sizeof(algo_array)/sizeof(IRadixSort*);
+  const char *algo_labels[nAlgos] = {"MCR", "MSD"};
+>>>>>>> a3b091c696d9f3f5386ab7e1e355c52054fdf009
   /*for (int i=0; i<nAlgos; i++) {
     algo_labels[i] = (*algo_array[i]).getLabel();
     }*/
@@ -109,8 +115,13 @@ int main(int argc, char **argv)
       for (int j = 0; j < RUN_TIMES; j++) {
 
 
+<<<<<<< HEAD
 	const int low = 1 << 29;
 	const int high = 1 << 30;
+=======
+	const int low = 1 << 27;
+	const int high = 1 << 29;
+>>>>>>> a3b091c696d9f3f5386ab7e1e355c52054fdf009
 	const int seed = j+1; // TODO
 	
 	fillArrayWithRandom(array, arrSize, low, high, seed);	

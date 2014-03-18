@@ -10,8 +10,17 @@
 
 
 \section{Implementations}
+This project describes experiments done with different sorting algorithms for sorting arrays of int keys. The implementations centers around radix sort, but we also perform experiment with QuickSort and CountingSort to have something to compare with.
+All algorithms in this project is based on approaches in \citep{radixSort}.
+The implementations have two methods:
+\begin{lstlisting}
+  void setup(int arrSize);
+  int* sort(int* array, int arrSize);
+\end{lstlisting}
+\verb!setup! is used to set up the algorithms and \verb!sort! sorts the array, which is the only one we measure in our experiments.
 
-
+The algorithms that sort based on digits, all assume that a digit, D, is 8 bits and the size of an int, K, is 32 bits.
+The goal of this project is to implement a Multi-core Radix Sort which uses both Most Significant Digit (MSD) - and Lowest Significant Digit (LSD) Radix Sort, and compare this implementation with other relevant sorting algorithms.
 
 
 \subsection{Counting sort (CS)}
@@ -26,13 +35,13 @@ Then we count down the Histogram[array[j]] by 1.
 This work for the case where we have multiple of the same key and in the case where we have only one of each key, because in line 11 we decrease the starting index by 1 after having placed one instance of the key, so the previous won't be overwritten.
 \lstinputlisting[language=C++, firstline=32, lastline=46, numbers=left]{./Figures/Project2b/CountingSort.cpp}
 
+
 \subsection{Quick sort (QS)}
 We use a Quick Sort from a \verb!C++! library because we want to compare our other algorithms with one that has a running time of $ O(n\cdot \log n) $ which Quick Sort does.
 We call the library function in line 1 which takes an array, the size of the array, the type of elements (int in our case) and a compare function.
 \lstinputlisting[language=C++, firstline=20, lastline=21, numbers=left]{./Figures/Project2b/QuickSort.cpp}
 The compare function states that the input should e sorted from the smallest key to the greatest.
 \lstinputlisting[language=C++, firstline=13, lastline=16, numbers=left]{./Figures/Project2b/QuickSort.cpp}
-
 
 
 \subsection{Least significant digit (LSD)}
@@ -247,21 +256,21 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 		\includegraphics[width=\textwidth]{./Figures/Project2b/Branch_misses.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Branch misses]{
-	Bla bla bla.
+	Branch misses for sorting algorithms based on array size.
 	}
 	\label{fig:Branch_misses_p2b}
 \end{figure}
-
 
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2b/Cache_misses.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Cache misses]{
-	Bla bla bla.
+	Cache misses for sorting algorithms based on array size.
 	}
 	\label{fig:Cache_misses_p2b}
 \end{figure}
+
 
 
 
@@ -270,7 +279,7 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 		\includegraphics[width=\textwidth]{./Figures/Project2b/Cache_refs.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Cache refs]{
-	Bla bla bla.
+	Number of cache references for sorting algorithms based on array size.
 	}
 	\label{fig:Cache_refs_p2b}
 \end{figure}
@@ -282,7 +291,7 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 		\includegraphics[width=\textwidth]{./Figures/Project2b/Cpu_cycles.pdf}
 		\rule{35em}{0.5pt}
 	\caption[CPU cycles]{
-	Bla bla bla.
+	Measure CPU cycles for sorting algorithms based on array size.
 	}
 	\label{fig:Cpu_cycles_p2b}
 \end{figure}
@@ -293,17 +302,22 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 		\includegraphics[width=\textwidth]{./Figures/Project2b/Instructions.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Instructions]{
-	Bla bla bla.
+	Hardware instructions for sorting algorithms based on array size.
 	}
 	\label{fig:Instructions_p2b}
 \end{figure}
+The algorithm that using fewest instructions is MCR, which at first glance seems surprising for such a complex algorithm.
+MCR also has the lowest gradient where QS has the steepest, which maybe could be explained by the recursive manner of QuickSort.
+Logically the slope MCR should follow LSD and/or MSD, because MCR uses approach from both of them.
+A guess to the low number of instructions for MCR, could be that a lot of instructions can be optimized away.
+The algorithm with the highest number of base instructions is MSD, which can be explained by that a lot of queue is created in the recursive structure wchich all needs to be maintained. 
 
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2b/Page_faults.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Page faults]{
-	Bla bla bla.
+	Memory page faults for sorting algorithms based on array size.
 	}
 	\label{fig:Page_faults_p2b}
 \end{figure}
