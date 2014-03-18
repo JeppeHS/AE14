@@ -123,7 +123,8 @@ The implementation is based on the pseudocode from the forementioned article:
 \end{figure}
 
 As in the pseudocode the algorithm start out by sorting the array based on the most significant digit in parallel, then serial compute output indicies (PrefixSum in pseudocode) and finally parallel sort each bucket based on LSD.  
-The parallel parts is implemented using Posix threads
+The parallel parts is implemented using POSIX threads (<pthread.h>), which by default utilizes multicore cpus by starting each thread on a new cpu.
+
 
 
 
