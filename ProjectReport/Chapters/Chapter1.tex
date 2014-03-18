@@ -59,7 +59,7 @@ We continue until we find the element we are looking for or we return -1 if our 
 
 
 The following is a recursive method for filling out the bfs tree. The method is called by ``insert(0)''.
-\begin{verbatim}
+\begin{lstlisting}[numbers=left]
 void insert(int bfsIndex){
   if (bfsIndex >= SIZE) return;
   insert(2*bfsIndex+1); // Left child
@@ -67,11 +67,11 @@ void insert(int bfsIndex){
   linIndex++;
   insert(2*bfsIndex+2); // Right child
 }
-\end{verbatim}
+\end{lstlisting}
 
 
 The binary search is then implemented as follows:
-\begin{verbatim}
+\begin{lstlisting}[numbers=left]
   int i = 0;
   int curr = bfsArray[i];  // The current node visited
   int res = -1;  // The latest element smaller than 'elem'.
@@ -89,7 +89,7 @@ The binary search is then implemented as follows:
   }
   // At this point, the while loop did not continue because curr==elem
   return curr;
-\end{verbatim}
+\end{lstlisting}
 
 
 
@@ -140,36 +140,53 @@ node = node + (1<<(treeHeight-atDepth));
 
 The vEB array is constructed using the following recursive method. It is called using ``insert(0,0,0,roots)'' where roots is an array of the same size as the depth of the tree.
 
-\begin{verbatim}
+\begin{lstlisting}[numbers=left,escapeinside={@}{@}]
 void insert(int vebIndex, int atDepth, int depthIndex, int roots[]){
   if (vebIndex >= size || vebIndex < 0) {
     return;
   }
-  int rootIndex = findPosition((~atDepth+1) & atDepth); // findRightmostOne(atDepth)
-  int depthType = findPosition(~atDepth & (atDepth+1)); // findRightmostZero(atDepth)
-    
+  int rootIndex = findPosition((~atDepth+1) & atDepth); // returns the position of the rightmost 1-bit in "atDepth".
+  int depthType = findPosition(~atDepth & (atDepth+1)); // returns the position of the rightmost 0-bit in "atDepth".
   int rootsNew[depth];
   for (int i=0; i<depth; i++){
       if (i <= rootIndex) rootsNew[i] = vebIndex;
       else rootsNew[i] = roots[i];
   }
-
-  int amount = 1<<((1<<depthType)-1);
-  int vebLeft = (2*(depthIndex & (amount-1)) +1) * (2*amount -1) + rootsNew[depthType];
-
-  insert(vebLeft, atDepth+1, 2*depthIndex, rootsNew); // Left child
-    
+  int amount = 1<<((1<<depthType)-1);  // 2^(2^depthType - 1)
+  @\label{lst:vebLeft}@int vebLeft = (2*(depthIndex & (amount-1)) +1) * (2*amount -1) + rootsNew[depthType];  // (2*(depthIndex % amount)+1) * 2^(2^depthType) + "The root of the smallest local subtree"  insert(vebLeft, atDepth+1, 2*depthIndex, rootsNew); // Left child
   vebArray[vebIndex] = *(linArray+linIndex);
   linIndex++;
-
   int vebRight = vebLeft + 2*amount -1;
   insert(vebRight, atDepth+1, 2*depthIndex+1, rootsNew); // Right child
 }
-\end{verbatim}
+\end{lstlisting}
+
+This vEB structure does not depend on the size of the input array. As a consequence, only inputs of size $2^{2^n}-1$ where $n$ is an integer generates fully balanced trees.
+Otherwise it will always be more or less unbalanced, where the most of weight is located to the left. If for example the size is 9 then the left side will contain 7 elements compared to only 1 on the right side.
+If we go one ``tree order'' further, if the size is 135, then there will be eight subtrees of size 15 each located to the of the root. That is, there will be 142 elements to the left of the root versus only 7 to the right.
+In these two examples, almost half of the tree structure would not be utilized. Consequently, searching will on average require more iterations than balanced tree, since the tree is higher.
+The worst case for this type of layout happens when the input size is $k 2^{2^n}$ where $2 < k \ll 2^{2^n}$. Then, more than half of the elements are located in the lower half of the tree, while at the same time, the tree is much higher than in a balanced tree.
+
+The index calculation in line \ref{lst:vebLeft} is quite complex.
+Some of the variables leading up to this calculation are illustrated in figure \ref{fig:vEB}.
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project1/vEB.eps}
+		\rule{35em}{0.5pt}
+	\caption[Van Emde Boas construction]{
+	Bla bla bla.
+	}
+	\label{fig:vEB}
+\end{figure}
+
+First we do \verb!depthIndex&(amount-1)! which calculates how far to the right we are in the relevant subtree.
+Then we double this value to find the number of new subtrees already placed by the neighbouring nodes to the left. One is added to take the current subtree into acount.
+That value is now multiplied by the size of the current subtrees which is \verb!2*amount-1! to get the index of the left child in the parenting subtree.
+Finally we add the index of root of the parenting subtree.
 
 
 The binary search is implemented as follows:
-\begin{verbatim}
+\begin{lstlisting}[numbers=left]
   int vebIndex = 0;
   int curr = vebArray[vebIndex]; // The current node visited
   int res = -1; // The latest element smaller than 'elem'.
@@ -179,23 +196,22 @@ The binary search is implemented as follows:
   for (int i=0; i<depth; i++){
       roots[i] = 0;
   }
-    
   while (curr != elem){
-    int rootIndex = findPosition((~atDepth+1) & atDepth); // findRightmostOne(atDepth)
-    int depthType = findPosition(~atDepth & (atDepth+1)); // findRightmostZero(atDepth)
-
+    int rootIndex = ... // same as above
+    int depthType = ...
+    int amount = ...
+    
     for (int i=0; i<=rootIndex; i++){
 	roots[i] = vebIndex;
     }
     int goRight = curr < elem;
-    int amount = 1<<((1<<depthType)-1);
     vebIndex = (2*(depthIndex & (amount-1)) +1 + goRight) * (2*amount -1) + roots[depthType];
 
     if (goRight){
       res = curr;  // This is now the latest known element smaller than 'elem'.
     }
     if (vebIndex >= size || vebIndex < 0){
-      return res;
+      return res;  // we have reached the bottom of the tree.
     }
     atDepth++;
     depthIndex = 2*depthIndex + goRight;
@@ -203,7 +219,7 @@ The binary search is implemented as follows:
   }
   // At this point, the while loop did not continue because curr==elem
   return curr;
-\end{verbatim}
+\end{lstlisting}
 
 
 

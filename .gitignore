@@ -16,7 +16,8 @@
 *.gch
 *.csv
 geany_run_script.sh
-*.png
+*/Measurements/*.png
+*/Measurements/*.pdf
 
 # Latex stuff
 *.tex~
