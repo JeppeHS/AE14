@@ -1,0 +1,82 @@
+% Chapter Template
+
+\chapter{Methods} % Main chapter title
+
+\label{Chapter0} % Change X to a consecutive number; for referencing this
+chapter elsewhere, use \ref{ChapterX}
+
+\lhead{Chapter 0. \emph{Methods}} % Change X to a consecutive number; this is
+for the header on each page - perhaps a shortened title
+
+%-------------------------------------------------------------------------------
+%	SECTION 1
+%-------------------------------------------------------------------------------
+\section{Language}
+All of the implementations are written in c++. Execution is carried out on a
+Linux machine. Linux is necessary for utilizing perf\_event\_open, see section
+\ref{section:perf_stat}.
+
+Compiling is done using the gnu compiler with the command ``g++ -std=c++0x
+-O3''.
+The first option is included to be able to use certain code constructions.
+The second option is included to make the compiler optimize the code as much as
+possible.
+By optimizing the code via the compiler, the execution statistics will, to some
+extend, become less dependent on the exact construction of the source code.
+Thus, we should be able to identify differences in executions based on how the
+algorithms work.
+
+
+
+
+%-------------------------------------------------------------------------------
+%	SECTION 2
+%-------------------------------------------------------------------------------
+\section{Testing}
+We are comparing the output of all implementations.
+
+Discuss other methods for testing/verifying...... Advantages/disadvantages....
+
+
+%-------------------------------------------------------------------------------
+%	SECTION 3
+%-------------------------------------------------------------------------------
+\section{Measuring execution statistics} \label{section:perf_stat}
+In order to compare the execution of different implementations, we need to
+measure some statistics such as running time. 
+Linux provides perf\_event\_open() \citep{perfStat} which can track a lot of
+different stats. Most notably, we have chosen to focus on the following:
+\begin{itemize}
+ \item Branch misses: The number of times the branch prediction has made a guess
+that turned out to be wrong.
+ \item Cache refs: The number of times an address is read from the cache.
+ \item Cache misses: The number of times an address is read that doesn't already
+exist in the cache.
+ \item Cpu cycles: The number of cycles used by the CPU for carrying out the
+necessary calculations. As far as we have seen, this is the most accurate way to
+compare the actual running times. If we try to measure the actual time between
+the start and end of an execution, we also measure the time it takes to execute
+all sorts of background processes, graphic rendering etc. that could be
+interrupting the thread we are interested in.
+ 
+ \item Instructions: The number of low-level instructions used to execute the
+code.
+ \item Page faults: The number of times ...........?
+\end{itemize}
+
+
+
+
+%-------------------------------------------------------------------------------
+%	SECTION 4
+%-------------------------------------------------------------------------------
+\section{Results presented}
+We have chosen to present the stats with the most interesting properties in each
+of the projects.
+
+The results are plotted using gnuplot.
+The scales on the x- and y-axes are chosen to be able to distinguish the
+implementations.
+
+
+All implementations, executables, figures etc. is available at \citep{github}.
