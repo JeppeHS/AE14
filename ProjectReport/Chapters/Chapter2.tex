@@ -90,7 +90,7 @@ The approach is to multiply two matrices by dividing them into sub-matrices and 
 The idea is to base the size of the sub-matrices on the cache size and thereby utilize the cache in the best way (i.e. fewer cache faults).   
 
 TMM is implemented by splitting the input matrices (A and B) into S sub-matrices in each dimension, then multiplying the sub-matrices producing the multiplied matrix (C). 
-The value of S is calculated based on a value CACHE_SIZE_KB which we choose depending on the platform. S is calculated so that three sub-matrices can fit in cache at the same time (as described in the article).
+The value of S is calculated based on a value \verb!CACHE_SIZE_KB! which we choose depending on the platform. S is calculated so that three sub-matrices can fit in cache at the same time (as described in the article).
 The calculation is as follows:
 \begin{lstlisting}[numbers=left]
   ...

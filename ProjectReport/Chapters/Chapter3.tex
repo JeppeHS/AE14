@@ -110,7 +110,7 @@ for (int i = 0; i < N_PASSES; i++) {
   }
 }
 \end{lstlisting}
-\begin{lstlisting}sortedArray[j] >> (K-i*D)) & MASK_D\end{lstlisting} gets the digit we want to look at by right shifting the value and anding it with a bit mask containing 0s except for the lowest D bits, which is 1s.
+\verb!sortedArray[j] >> (K-i*D)) & MASK_D! gets the digit we want to look at by right shifting the value and anding it with a bit mask containing 0s except for the lowest D bits, which is 1s.
 The algorithm was straight forward to implement an contains no complex computation. If one wanted to improve performance a differen datastructure for buckets could maybe be used.
 
 
@@ -124,7 +124,8 @@ This version has not been implemented, but it could be done by making similar mo
 \subsection{Multicore radix sort (MCR) \citep{radixSort}}
 The implementation of Multi-core Radix Sort (MCR) is based on the approach in \citep{radixSort}. The idea behind is to use the benefits of both MSD and LSD and making the algorithm parallel to decrease computation time. 
 The algorithm first partitions the input array into buckets with based on MSD and then sort each of theses buckets locally with using LSD.  
-MSD has the disavangtage of not being very effective on arrays of small size, because it can results of a lot of empty buckets. But is good at...
+MSD has the disavangtage of not being very effective on arrays of small size or values is close to each other, because it can results of a lot of empty buckets. 
+But has the advantage that when the values is sorted by one digit sorting by next digit only moves around the 
 LSD on the other hand ...
 
 The implementation is based on the pseudocode from the forementioned article:
@@ -158,10 +159,72 @@ bucketArray and nextArray coresponds to the threads arrays in threadBucketArrays
 The next part consist of the program computing (serial) output indices used to index the output array by traversing over the all the threads nextArrays.   
 The array computed from this, ouputMSDStartIndices, is a kind of prefix sum over sizes of the MSD-bucket, but where the values are shifted on to the right in the array (i.e. the first element is 0).
 
-The last part
+In the last part, the MSD buckets is divided among the threads, which sort the assigned buckets locally based on LSD and then write sorted values to the output array.
+For each MSD bucket assigned to a thread, it first sort the values in the bucket into new buckets (locally) based on the lowest significant digit. This is straight forward.
+Then traversing through the bucket sorted by lowest significant digit, the values are divided into buckets depending on the second lowest significant digit.
+And in same traversal a histogram for the third lowest significant digit is produces.
+\begin{lstlisting}
+...
+  for (int bucket = 0; bucket < nBuckets; bucket++) {
+    for (int i = 0; i < nexts0[bucket]; i++) {
+      elem = buckets0[bucket*arraySize + i];
 
-The algorithm is not generic but assumes that K and D always is K = 32 and D = 8........
+      // Put in bucket
+      putInBucket = (elem >> shiftRight2nLast) & lsdBitMask;
+      buckets1[putInBucket*arraySize + nexts1[putInBucket]] = elem;
+      nexts1[putInBucket]++;
 
+      // Histogram
+      histIdx = (elem >> shiftRightLast) & lsdBitMask;
+      histogram2[histIdx]++;
+    }
+  }
+...
+\end{lstlisting}
+This histogram is then used to produce a prefix sum following same procedure as for the output indices.
+\begin{lstlisting}
+... 
+  prefixSum2[0] = 0;
+    for (int i = 0; i < nBuckets; i++) {
+      // Prefix sum
+      if (i != nBuckets -1) {
+	prefixSum2[i+1] = prefixSum2[i] + histogram2[i];
+      } 
+  }
+...
+\end{lstlisting}
+
+This prefix sum is used together with the calculated output indices (\verb!ouputMSDStartIndices!) to index the sorted values to the correct positions int the output array.
+\begin{lstlisting}
+...
+  // Last pass: write to output array
+  for (int bucket = 0; bucket < nBuckets; bucket++) {
+    for (int i = 0; i < nexts1[bucket]; i++) {
+      elem = buckets1[bucket*arraySize + i];
+
+      putInBucket = (elem >> shiftRightLast) & lsdBitMask;
+
+      outputIdx = startIdxForMSDBucket + prefixSum2[putInBucket];
+
+      prefixSum2[putInBucket]++;
+      sortedArray[outputIdx] = elem;
+    }
+  }
+... 
+\end{lstlisting}
+Where \verb!startIdxForMSDBucket = ouputMSDStartIndices[msdBucket]!.
+This trick by using the computed prefix sum for the third lowest significant digit, saves a traversal of the buckets and makes the algorithm a bit faster.
+
+The program uses hardcoded D and K, where D is number of bits per digit and K is number of bits per integer. Our implementation assumes that these values always is K = 32 and D = 8.
+The implementation could be made generic, taking an abitrary K and D, but we didn't have the time and the algorithm in the article is depends on these values of D and K.
+A generic solution could be achieved simply by adding LSD sorting in between the first LSD sorting and the second to last LSD sorting.
+
+It turns out that the parallel parts of this implementation in fact doesn't run in parallel. This is with high probability because some methods locks the program to make serial computation.
+We now for a fact that the \verb!srand! methods does this, but what other functionality in the implementation has this effect.   
+
+.........INSERT PICTURE
+
+As seen as above, different threads on different cpus is stared, but these doesn't run in parallel.
 
 \section{Results and discussion}
 
