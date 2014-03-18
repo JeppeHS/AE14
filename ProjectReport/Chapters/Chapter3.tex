@@ -22,14 +22,20 @@
 We start by finding the greatest value in the list gKey.
 gKey = Max(Array)+1
 We use gKey to create a new array C and for every entry in C we set the value to 0.
-in line 4-5 we go through the input array and use the c array as a histogram so for all the elements i array we go to the equvalent index in C and increase it by 1.
-
+in line 4-5 we go through the input array and use the Histogram array to keep trak of how many of a specific element we have, so for all the elements in array we go to the equvalent index in Histogram and increase it by 1.
+In line 6-7 we use the Histogram to calculate the starting index of each key in array.
+In the last loop we go through the Histogram array and we iterate from the last index and down to the beginning of the array.
+The index of Histogram[array[j]-1] is where the j'th element of array should be in the result array.
+Then we count down the Histogram[array[j]] by 1.
+This work for the case where we have multiple of the same key and in the case where we have only one of each key, because in line 11 we decrease the starting index by 1 after having placed one instance of the key, so the previous won't be overwritten.
 \lstinputlisting[language=C++, firstline=32, lastline=46, numbers=left]{./Figures/Project2b/CountingSort.cpp}
 
 \subsection{Quick sort (QS)}
-\lstinputlisting[language=C++, firstline=13, lastline=16, numbers=left]{./Figures/Project2b/QuickSort.cpp}
+We use a Quick Sort from a \verb!C++! library because we want to compare our other algorithms with one that has a running time of $ O(n\cdot \log n) $ which Quick Sort does.
+We call the library function in line 1 which takes an array, the size of the array, the type of elements (int in our case) and a compare function.
 \lstinputlisting[language=C++, firstline=20, lastline=21, numbers=left]{./Figures/Project2b/QuickSort.cpp}
-
+The compare function states that the input should e sorted from the smallest key to the greatest.
+\lstinputlisting[language=C++, firstline=13, lastline=16, numbers=left]{./Figures/Project2b/QuickSort.cpp}
 \subsection{Most significant digit (MSD)}
 
 The MSD radix sort is implemented as follows:
