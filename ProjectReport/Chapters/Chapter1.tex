@@ -26,8 +26,40 @@ The following four implementations of the binary search algorithm used four diff
 \end{figure}
 
 
+\subsection{Linear search}
+To compare the running times for the algorithms, we have implemented a linear search function.
+\begin{verbatim}
+For each item in the list:
+     if that item has the desired value,
+         stop the search and return the item's location.
+\end{verbatim}
+ Return -1\footnote{We return -1 if the element dosn't exist in the list}.
+ \begin{lstlisting}[numbers=left]
+ // Check result
+if (oldRes != -1 && oldRes != newRes) {
+	printf("Wrong result. prev:%s %d, new:%s %d, ArrSize %d, searchFor %d\n", algo_labels[iAlg-1], oldRes, algo_labels[iAlg], newRes, arrSize, searchFor); 
+ 					
+}
+oldRes = newRes;
+\end{lstlisting}
+We compare the results for the different algorithms in our test
+
 \subsection{Inorder}
 
+We have made a inorder binary search to compare with BFS, DFS and vEB.
+Inorder is made iterative.
+\lstinputlisting[language=C++, firstline=32, lastline=51, numbers=left]{./Figures/BinarySearch.cpp}
+We begin by defining low, high and smallestSoFar.
+
+In line 8 we make a while-loop, we run while high is greater than low.
+
+We start by looking at the element whom is in the middle of the array.
+If that element is smaller than the one we are looking for we set low to point at the middle +1.
+If we are in the opposite case we set high to point at the middle -1.
+
+The idea is that the array all the time is divided into one half the size where low will point at the first element in the new array and high will point at the last.
+
+We continue until we find the element we are looking for or we return -1 if our list dosn't contain it.
 
 \subsection{Breadth-first search (BFS)}
 

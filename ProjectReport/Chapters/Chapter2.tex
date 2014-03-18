@@ -16,10 +16,27 @@
 \section{Implementations \citep{matrixMultiplication}}
 
 
-\subsection{Naive}
+\subsection{Naive Matrix Multiplikation}
+We have implemented a naive matrix multiplication to compare with the other algorithms.
 
+The first line creates a matrix for saving the result of the multiplication in.
 
-\subsection{Naive - transposed}
+Then for all the rows in the first matrix and all the colums in the second matrix we take sum of the row element multiplied with the column element for alle the elements in the current column and row.
+
+Then we save the value in the resulting matrix.
+After we have iterated trough all the columns and rows we return the resulting matrix.
+\lstinputlisting[language=C++, firstline=16, lastline=29, numbers=left]{./Figures/NaiveMatrixMulti.cpp}
+
+\subsection{Transposed}
+\lstinputlisting[language=C++, firstline=5, lastline=6, numbers=left]{./Figures/Transpose.cpp}
+We start by transposing the input matrix in a transpose method that is called in the setup method.
+\lstinputlisting[language=C++, firstline=12, lastline=14, numbers=left]{./Figures/Transpose.cpp}
+The setup method should always be called before the matrix multiplication method is used.
+\lstinputlisting[language=C++, firstline=16, lastline=26, numbers=left]{./Figures/Transpose.cpp}
+After the transpose method has been called we start by creating a matrix p we use to save the result in.
+Then for all the colums in the transposed matrix mC, and all the colums in the second matrix B, we calculate the sum of the product between all the enties in the current column of mC and B.
+When we have iterated through all the colums in both matrixes and saved the results we are done.
+\lstinputlisting[language=C++, firstline=29, lastline=42, numbers=left]{./Figures/Transpose.cpp}
 
 
 \subsection{Recursive}
