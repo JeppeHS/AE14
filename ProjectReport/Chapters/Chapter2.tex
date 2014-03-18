@@ -9,8 +9,9 @@
 %----------------------------------------------------------------------------------------
 
 
-\section{Introduction}
+\section{Implementations}
 In this project we have implemented different algorithms for matrix multiplication, to experiment with different ways of utilizing cache.
+All implementations are based on \citep{matrixMultiplication}.
 For the implementations we created a matrix data type with the following methods:
 \begin{lstlisting}
   ...
@@ -24,10 +25,18 @@ For the implementations we created a matrix data type with the following methods
   bool matrixEquals(matrix* m1, matrix* m2);
   ...
 \end{lstlisting}
-The matrix is saved as a \verb!int[]! ..  and the the matrix entries is accessed like this \verb!int indx = j*(*m).nRows+i;!
+The matrix is saved as a \verb!int[]! where we save values by coloumns, i.e. the array consist of $[a_{11}, a_{21}, a_{31}, ... a_{nn}]$ for matrix A with size n.
+The matrix entries is then accessed like this \verb!int indx = j*(*m).nRows+i;!, where \verb!j! is coloumn index, \verb!i! is row index and \verb!nRows! is the number of rows in the matrix.
+The most logical way to implement a matrix in an array would be to save values by rows instead, but we choose to save by coloumns because of the way our experiments is set up.
+Each algorithm has two methods \verb!setup! and \verb!matrixMultiplication! which respectively set ups the algorithm and perform the matrix multiplication.
+\begin{lstlisting}
+  void setup(matrix* A, int height, int width);
+  matrix* matrixMultiplication(matrix* B);
+\end{lstlisting}
+In our experiments we keep one of the input matrices, A, static and varies the content of the second input matrix, B. 
+We wanted to test out the effects of using a transposed matrix in our computation, this meant that we have to transpose the static matrix A, beacause we didn't want to measure the time it took to transpose a matrix.
+This in turn meant that we had to save matrices by coloumns to see an advantage when transposing matrix A. 
 
-\section{Implementations}
-The implementations are based on \citep{matrixMultiplication}.
 
 \subsection{Naive Matrix Multiplikation}
 We have implemented a naive matrix multiplication to compare with the other algorithms.

@@ -8,13 +8,16 @@
 
 %----------------------------------------------------------------------------------------
 
-\section{Introduction}
+\section{Implementations}
 This project experiments with different binary search algorithms. All our implementations takes a sorted static array of integers as input, search
 this using a varying query value and returns the value if found or the next highest value in the array if not found.
 The different implementations all have a setup method called \verb!createDataStructure! and a search method called \verb!binSearch!.
 We only measure the execution of the \verb!binSearch! methods as our implementations assume a static input array.
+\begin{lstlisting}
+  void createDataStructure(int* arr, int arrSize);
+  int binSearch(int elem);
+\end{lstlisting}
 
-\section{Implementations}
 The following four implementations of the binary search algorithm used four different memory layouts. The tree structures are shown in figure \ref{fig:memory_layouts}.
 
 \begin{figure}[htbp]
