@@ -187,7 +187,7 @@ Finally we add the index of root of the parenting subtree.
 
 
 The binary search is implemented as follows:
-\begin{lstlisting}[numbers=left]
+\begin{lstlisting}[numbers=left,escapeinside={@}{@}]
   int vebIndex = 0;
   int curr = vebArray[vebIndex]; // The current node visited
   int res = -1; // The latest element smaller than 'elem'.
@@ -205,7 +205,7 @@ The binary search is implemented as follows:
     for (int i=0; i<=rootIndex; i++){
 	roots[i] = vebIndex;
     }
-    int goRight = curr < elem;
+    @\label{lst:veb_goRight}@int goRight = curr < elem;
     vebIndex = (2*(depthIndex & (amount-1)) +1 + goRight) * (2*amount -1) + roots[depthType];
 
     if (goRight){
@@ -231,37 +231,40 @@ The binary search is implemented as follows:
 
 \section{Results and discussion}
 
-
+Looking at the branch misses in figure \ref{fig:Branch_misses_p1}, we see that three of the implementations have almost the same number of branch misses as a function of array size.
+This follows intuitively from the fact that the trees are balanced and thus have the same height, and the number of branches are proportional to the height.
+The vEB implementation, however, has a constant number of branch misses, no matter the size of the array. This is not caused by the unbalanced tree structure, since an even higher tree should produce at least as many branch misses.
+Instead, it is caused by the specific way that the child index is calculated. Refering back to vEB binary search, when the comparison in line \ref{lst:goRight} is used directly in the index calculation, the compiler uses a conditional move operation, thus eliminating the actual branch.
 
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project1/Branch_misses.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Branch misses]{
-	Bla bla bla.
+	The number of branch misses are plotted against the array size.
 	}
 	\label{fig:Branch_misses_p1}
 \end{figure}
 
+
+In figure \ref{fig:Cache_misses_p1}, the number of cache misses are shown. Here, the implementation
 
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project1/Cache_misses.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Cache misses]{
-	Bla bla bla.
+	The number of cache misses against array size.
 	}
 	\label{fig:Cache_misses_p1}
 \end{figure}
-
-
 
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project1/Cache_refs.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Cache refs]{
-	Bla bla bla.
+	The number of cache references against array size.
 	}
 	\label{fig:Cache_refs_p1}
 \end{figure}

@@ -16,16 +16,15 @@ void CountingSort::setup(int arrSize){}
 int* CountingSort::sort(int* array, int arrSize)
 {
 	delete [] result;
-	result = nullptr;
+	//result = nullptr;
 	int gKey = 0;
 	int i, j;
 	result = new int[arrSize];
-	int* result = new int[arrSize];
 	for ( int i = 0; i < arrSize; i++)
 	{
 		if(array[i] > gKey)
 		{
-			gKey = array[i];
+		  gKey = array[i];
 		}
 	}
 	gKey++;  // added one...

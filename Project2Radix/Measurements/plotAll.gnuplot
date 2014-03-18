@@ -7,7 +7,7 @@ set logscale y
 
 set key top left
 
-set linetype 6 lc rgb 'black'
+#set linetype 6 lc rgb 'black'
 
 nAlgos = 6
 

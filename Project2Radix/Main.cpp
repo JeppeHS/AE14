@@ -43,9 +43,9 @@ int main(int argc, char **argv)
   PerfStatClass perf = PerfStatClass();
   const int nStats = perf.getNumberOfStats();
 
-  IRadixSort *algo_array[] = {&mcr, &msd, &msdCS, &cs, &qs, &lsd};  // <-- Choose the implementations to run.
+  IRadixSort *algo_array[] = {&msd, &msdCS, &mcr};  // <-- Choose the implementations to run.
   const int nAlgos = sizeof(algo_array)/sizeof(IRadixSort*);
-  const char *algo_labels[nAlgos] = {"MCR", "MSD", "MSD_arr", "CS", "QS", "LSD"};
+  const char *algo_labels[nAlgos] = {"MSD", "MSD_arr", "MCR"};
   /*for (int i=0; i<nAlgos; i++) {
     algo_labels[i] = (*algo_array[i]).getLabel();
     }*/
@@ -109,8 +109,8 @@ int main(int argc, char **argv)
       for (int j = 0; j < RUN_TIMES; j++) {
 
 
-	const int low = 1 << 9;
-	const int high = 1 << 10;
+	const int low = 1 << 29;
+	const int high = 1 << 30;
 	const int seed = j+1; // TODO
 	
 	fillArrayWithRandom(array, arrSize, low, high, seed);	
