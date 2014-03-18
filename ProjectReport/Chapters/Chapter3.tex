@@ -36,58 +36,6 @@ We call the library function in line 1 which takes an array, the size of the arr
 \lstinputlisting[language=C++, firstline=20, lastline=21, numbers=left]{./Figures/Project2b/QuickSort.cpp}
 The compare function states that the input should e sorted from the smallest key to the greatest.
 \lstinputlisting[language=C++, firstline=13, lastline=16, numbers=left]{./Figures/Project2b/QuickSort.cpp}
-\subsection{Most significant digit (MSD)}
-
-The MSD radix sort is implemented as follows:
-\begin{verbatim}
-  // Pass 0
-  queue<int> buckets[N_BUCKETS];
-  for (int i = 0; i < arrSize; i++) {
-    // Add to bucket
-    buckets[ sortedArray[i] >> (K-D) ].push(sortedArray[i]);
-  }
-  // Pass 1 (and the rest, recursively)
-  for (int b = 0; b < N_BUCKETS; b++) {
-    msdRecursive(buckets[b], 1);
-  }
-  return sortedArray;
-\end{verbatim}
-
-
-It makes use of the following recursive method:
-\begin{verbatim}
-void msdRecursive(queue<int> bucket, int pass) {
-  if (bucket.empty()) return;
-  
-  // Base case (this bucket is already fully sorted).
-  if (pass == N_PASSES) {
-    while(!bucket.empty()) {
-      sortedArray[sortArrIdx] = bucket.front();
-      bucket.pop();
-      sortArrIdx++;
-    }
-    return;
-  }
-  // Sort this bucket into some new buckets.
-  queue<int> buckets[N_BUCKETS];
-  while(!bucket.empty()) {
-    const int key = bucket.front();
-    bucket.pop();
-    // Add to bucket
-    buckets[ (key >> (K - (pass+1)*D)) & MASK_D ].push(key);
-  }
-    // Example (K=8, D=2, pass=1, so we have already sorted by AB, and now we look at CD):
-    // (ABCDEFGH >> (8 - (1+1)*2)) & 00000011
-    // (ABCDEFGH >> 4) & 00000011
-    //  0000ABCD & 00000011
-    //  000000CD
-
-  // Now, sort all buckets recursively.
-  for (int b = 0; b < N_BUCKETS; b++) {
-    msdRecursive(buckets[b], pass+1);
-  }
-}
-\end{verbatim}
 
 
 
@@ -121,7 +69,65 @@ for (int i = 0; i < N_PASSES; i++) {
 The algorithm was straight forward to implement an contains no complex computation. If one wanted to improve performance a differen datastructure for buckets could maybe be used.
 
 
+
+\subsection{Most significant digit (MSD)}
+MSD radix sort is very similar to LSD. However, we now sort the input by looking at the digits in descending order.
+After distributing the elements in buckets according to the most significant, these buckets are then sorted recursively.
+
+The MSD radix sort is implemented as follows:
+\begin{lstlisting}[numbers=left]
+  // Pass 0
+  queue<int> buckets[N_BUCKETS];
+  for (int i = 0; i < arrSize; i++) {
+    // Add to bucket
+    buckets[ sortedArray[i] >> (K-D) ].push(sortedArray[i]);
+  }
+  // Pass 1 (and the rest, recursively)
+  for (int b = 0; b < N_BUCKETS; b++) {
+    msdRecursive(buckets[b], 1);
+  }
+  return sortedArray;
+\end{lstlisting}
+
+It makes use of the following recursive method:
+\begin{lstlisting}[numbers=left]
+void msdRecursive(queue<int> bucket, int pass) {
+  if (bucket.empty()) return;
+  
+  // Base case (this bucket is already fully sorted).
+  if (pass == N_PASSES) {
+    while(!bucket.empty()) {
+      sortedArray[sortArrIdx] = bucket.front();
+      bucket.pop();
+      sortArrIdx++;
+    }
+    return;
+  }
+  // Sort this bucket into some new buckets.
+  queue<int> buckets[N_BUCKETS];
+  while(!bucket.empty()) {
+    const int key = bucket.front();
+    bucket.pop();
+    // Add to bucket
+    buckets[ (key >> (K - (pass+1)*D)) & MASK_D ].push(key);
+  }
+    // Example (K=8, D=2, pass=1, so we have already sorted by AB, and now we look at CD):
+    // (ABCDEFGH >> (8 - (1+1)*2)) & 00000011
+    // (ABCDEFGH >> 4) & 00000011
+    //  0000ABCD & 00000011
+    //  000000CD
+
+  // Now, sort all buckets recursively.
+  for (int b = 0; b < N_BUCKETS; b++) {
+    msdRecursive(buckets[b], pass+1);
+  }
+}
+\end{lstlisting}
+
 \subsection{MSD - using arrays (MSD\_arr)}
+This version of MSD radix sort makes use of one long array for each digit to by.
+These arrays are then of length \verb!N_KEYS*N_BUCKETS!. When we choose the number of buckets to be $2^8=256$, this would conceivably use that much more memory.
+However, when we only declare the arrays without initializing, the paged virtual memory can handle this kind of array by mapping the physical memory only when the pages are first accessed \citep{radixSort}.
 
 
 \subsection{Multicore radix sort (MCR)}
