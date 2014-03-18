@@ -7,7 +7,9 @@ set logscale y
 
 set key top left
 
-nAlgos = 5
+#set linetype 2 lc rgb 'black'
+
+nAlgos = 6
 
 set key autotitle columnhead
 

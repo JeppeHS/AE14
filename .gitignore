@@ -14,7 +14,7 @@
 
 *.out
 *.gch
-*.csv
+#*.csv
 geany_run_script.sh
 */Measurements/*.png
 */Measurements/*.pdf

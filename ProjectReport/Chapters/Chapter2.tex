@@ -13,8 +13,8 @@
 
 
 
-\section{Implementations \citep{matrixMultiplication}}
-
+\section{Implementations}
+The implementations are based on \citep{matrixMultiplication}.
 
 \subsection{Naive Matrix Multiplikation}
 We have implemented a naive matrix multiplication to compare with the other algorithms.
@@ -41,7 +41,7 @@ When we have iterated through all the colums in both matrixes and saved the resu
 
 \subsection{Recursive}
 The recursive multiplication is implemented as follows:
-\begin{verbatim}
+\begin{lstlisting}[numbers=left]
    int m = heightA;
   int n = widthA;
   int p = (*matrixB).nCols;
@@ -51,10 +51,10 @@ The recursive multiplication is implemented as follows:
   recMult(0, 0, 0, 0, m, n, p);
   
   return C;
-\end{verbatim}
+\end{lstlisting}
 
 It makes use of the following recursive method:
-\begin{verbatim}
+\begin{lstlisting}[numbers=left]
 void recMult(int i_A, int j_A, int i_B, int j_B, int m, int n, int p) {
   if (m==1 && n==1 && p==1) { // base case
     int AB = matrixGet(A, i_A, j_A)*matrixGet(B, i_B, j_B);
@@ -71,7 +71,7 @@ void recMult(int i_A, int j_A, int i_B, int j_B, int m, int n, int p) {
   }
   return;
 }
-\end{verbatim}
+\end{lstlisting}
 
 
 
@@ -82,10 +82,10 @@ The approach is to multiply two matrices by dividing them into sub-matrices and 
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2a/TiledMulti_Pseudo.jpg}
 		\rule{35em}{0.5pt}
-	\caption[Branch misses]{
+	\caption[Pseudocode for tiled multiplication]{
 	Bla bla bla.
 	}
-	\label{fig:Branch_misses}
+	\label{fig:TiledMulti_Pseudo}
 \end{figure}
 The idea is to base the size of the sub-matrices on the cache size and thereby utilize the cache in the best way (i.e. fewer cache faults).   
 
@@ -134,7 +134,7 @@ Maintaining these values also means that A and B can be multiplied without depen
 	\caption[Branch misses]{
 	Bla bla bla.
 	}
-	\label{fig:Branch_misses}
+	\label{fig:Branch_misses_p2a}
 \end{figure}
 
 
@@ -145,7 +145,7 @@ Maintaining these values also means that A and B can be multiplied without depen
 	\caption[Cache misses]{
 	Bla bla bla.
 	}
-	\label{fig:Cache_misses}
+	\label{fig:Cache_misses_p2a}
 \end{figure}
 
 
@@ -157,7 +157,7 @@ Maintaining these values also means that A and B can be multiplied without depen
 	\caption[Cache refs]{
 	Bla bla bla.
 	}
-	\label{fig:Cache_refs}
+	\label{fig:Cache_refs_p2a}
 \end{figure}
 
 
@@ -169,7 +169,7 @@ Maintaining these values also means that A and B can be multiplied without depen
 	\caption[CPU cycles]{
 	Bla bla bla.
 	}
-	\label{fig:Cpu_cycles}
+	\label{fig:Cpu_cycles_p2a}
 \end{figure}
 
 
@@ -180,5 +180,5 @@ Maintaining these values also means that A and B can be multiplied without depen
 	\caption[Instructions]{
 	Bla bla bla.
 	}
-	\label{fig:Instructions}
+	\label{fig:Instructions_p2a}
 \end{figure}

@@ -121,7 +121,7 @@ The algorithm was straight forward to implement an contains no complex computati
 This version has not been implemented, but it could be done by making similar modifications to LSD as above.
 
 
-\subsection{Multicore radix sort (MCR) \citep{radixSort}}
+\subsection{Multicore radix sort (MCR)}
 The implementation of Multi-core Radix Sort (MCR) is based on the approach in \citep{radixSort}. The idea behind is to use the benefits of both MSD and LSD and making the algorithm parallel to decrease computation time. 
 The algorithm first partitions the input array into buckets with based on MSD and then sort each of theses buckets locally with using LSD.  
 MSD has the disavangtage of not being very effective on arrays of small size or values is close to each other, because it can results of a lot of empty buckets. 
@@ -222,9 +222,17 @@ A generic solution could be achieved simply by adding LSD sorting in between the
 It turns out that the parallel parts of this implementation in fact doesn't run in parallel. This is with high probability because some methods locks the program to make serial computation.
 We now for a fact that the \verb!srand! methods does this, but what other functionality in the implementation has this effect.   
 
-.........INSERT PICTURE
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project2b/multicore_cpu_usage.png}
+		\rule{35em}{0.5pt}
+	\caption[Multicore CPU usage]{
+	Bla bla bla.
+	}
+	\label{fig:multicore_cpu_usage}
+\end{figure}
 
-As seen as above, different threads on different cpus is stared, but these doesn't run in parallel.
+As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different cpus is stared, but these doesn't run in parallel.
 
 \section{Results and discussion}
 
@@ -236,7 +244,7 @@ As seen as above, different threads on different cpus is stared, but these doesn
 	\caption[Branch misses]{
 	Bla bla bla.
 	}
-	\label{fig:Branch_misses}
+	\label{fig:Branch_misses_p2b}
 \end{figure}
 
 
@@ -247,7 +255,7 @@ As seen as above, different threads on different cpus is stared, but these doesn
 	\caption[Cache misses]{
 	Bla bla bla.
 	}
-	\label{fig:Cache_misses}
+	\label{fig:Cache_misses_p2b}
 \end{figure}
 
 
@@ -259,7 +267,7 @@ As seen as above, different threads on different cpus is stared, but these doesn
 	\caption[Cache refs]{
 	Bla bla bla.
 	}
-	\label{fig:Cache_refs}
+	\label{fig:Cache_refs_p2b}
 \end{figure}
 
 
@@ -271,7 +279,7 @@ As seen as above, different threads on different cpus is stared, but these doesn
 	\caption[CPU cycles]{
 	Bla bla bla.
 	}
-	\label{fig:Cpu_cycles}
+	\label{fig:Cpu_cycles_p2b}
 \end{figure}
 
 
@@ -282,7 +290,7 @@ As seen as above, different threads on different cpus is stared, but these doesn
 	\caption[Instructions]{
 	Bla bla bla.
 	}
-	\label{fig:Instructions}
+	\label{fig:Instructions_p2b}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -292,7 +300,7 @@ As seen as above, different threads on different cpus is stared, but these doesn
 	\caption[Page faults]{
 	Bla bla bla.
 	}
-	\label{fig:Page_faults}
+	\label{fig:Page_faults_p2b}
 \end{figure}
 
 
