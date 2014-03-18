@@ -86,13 +86,32 @@ void msdRecursive(queue<int> bucket, int pass) {
 
 
 \subsection{Least significant digit (LSD)}
-Idea:
 To have something to compare the Multi-core Radix Sort to, we implemented, among others, Least Significant Digit (LSD) radix sort. 
-The idea is to sort the input array of keys into buckets sorting starting from the lowest significant digit the producing an array sorted from the current digit, continuing until the input array is sorted. 
+The idea is to sort the input array of keys into buckets starting from the lowest significant digit. After each sorting into buckets for a digit an array sorted from the that digit is produced. 
+This is done for each digit until the input array is fully sorted. 
 
-Implemtation:
 The implemtation uses C++ std:queue structure to simulate buckets. We assume that this data structure utilizes memory and computation quite effectively, and it seem logical to use this instead of creating our own bucket data structure.
-In the method 'sort' sort the array as mentioned before, by iterating over the digits starting from the lowest significant one. At each iteration sorting the keys into buckets and then creating a new array from these buckets.
+In the method 'sort' the pgram sorts the array as mentioned before, by iterating over the digits starting from the lowest significant one. At each iteration sorting the keys into buckets and then creating a new array from these buckets.
+\begin{lstlisting}[numbers=left]
+...
+for (int i = 0; i < N_PASSES; i++) {
+  for (int j = 0; j < arrSize; j++) {
+    // Add to bucket
+    buckets[ (sortedArray[j] >> (K-i*D)) & MASK_D ].push(sortedArray[j]);
+  }
+  // Create sorted array from buckets
+  int sortArrIdx = 0;
+  for (int k = 0; k < N_BUCKETS; k++) {
+    while(!buckets[k].empty()) {
+      sortedArray[sortArrIdx] = buckets[k].front();
+      buckets[k].pop();
+      sortArrIdx++;
+    }
+  }
+}
+\end{lstlisting}
+\begin{lstlisting}sortedArray[j] >> (K-i*D)) & MASK_D\end{lstlisting} gets the digit we want to look at by right shifting the value and anding it with a bit mask containing 0s except for the lowest D bits, which is 1s.
+The algorithm was straight forward to implement an contains no complex computation. If one wanted to improve performance a differen datastructure for buckets could maybe be used.
 
 
 \subsection{MSD - using arrays (MSD\_arr)}
@@ -103,14 +122,11 @@ This version has not been implemented, but it could be done by making similar mo
 
 
 \subsection{Multicore radix sort (MCR) \citep{radixSort}}
-Idea:
-The implementation of Multi-core Radix Sort (MCR) is based on \citep{radixSort}. The idea behind is to use the benefits of both MSD and LSD and making the algorithm parallel to decrease computation time. 
-The algorithm first partitions into buckets with MSD and then sort each of theses buckets locally with LSD.  
+The implementation of Multi-core Radix Sort (MCR) is based on the approach in \citep{radixSort}. The idea behind is to use the benefits of both MSD and LSD and making the algorithm parallel to decrease computation time. 
+The algorithm first partitions the input array into buckets with based on MSD and then sort each of theses buckets locally with using LSD.  
 MSD has the disavangtage of not being very effective on arrays of small size, because it can results of a lot of empty buckets. But is good at...
 LSD on the other hand ...
 
-
-Implementation:
 The implementation is based on the pseudocode from the forementioned article:
 \begin{figure}[htbp]
 	\centering
@@ -121,11 +137,30 @@ The implementation is based on the pseudocode from the forementioned article:
 	}
 	\label{fig:Branch_misses}
 \end{figure}
-
-As in the pseudocode the algorithm start out by sorting the array based on the most significant digit in parallel, then serial compute output indicies (PrefixSum in pseudocode) and finally parallel sort each bucket based on LSD.  
+As in the pseudocode the program starts out by sorting the array based on the most significant digit in parallel, then serial compute output indicies (PrefixSum in the pseudocode) and finally parallel sort each bucket based on LSD.  
 The parallel parts is implemented using POSIX threads (<pthread.h>), which by default utilizes multicore cpus by starting each thread on a new cpu.
 
+The program has two 2D arrays which respectively holds buckets and bucket histograms for each thread. These are called threadBucketArrays and threadNextArrays.
+Each of the bucket arrays in threadBucketArrays inititally took up N x M space, where N is elements in the input array and M is number of buckets.
+This means a lot of space had to be reserved by the program. To minimize this space usage, N is bound by the number of elements assigned to the current thread.
+This yields that each bucket array takes up (N / P) x M, where P is the number of threads. 
 
+The parallel MSD part (first part) assigns part of the input array to each thread, which then sort the elements int buckets based on the most significant digit.
+The sorting is saved in the formentioned shared threadBucketArrays using threadNextArrays to index these bucket arrays:
+\begin{lstlisting}
+...
+bucketArray[ putInBucket*nElemsAssigned[tInfo->threadNum] + nextArray[putInBucket] ] = inputArray[i];
+nextArray[putInBucket]++; 
+... 
+\end{lstlisting}
+bucketArray and nextArray coresponds to the threads arrays in threadBucketArrays and threadNextArrays.
+
+The next part consist of the program computing (serial) output indices used to index the output array by traversing over the all the threads nextArrays.   
+The array computed from this, ouputMSDStartIndices, is a kind of prefix sum over sizes of the MSD-bucket, but where the values are shifted on to the right in the array (i.e. the first element is 0).
+
+The last part
+
+The algorithm is not generic but assumes that K and D always is K = 32 and D = 8........
 
 
 \section{Results and discussion}

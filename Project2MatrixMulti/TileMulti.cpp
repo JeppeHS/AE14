@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include "TileMulti.h"
 
+#define CACHE_SIZE_KB 512 
 using namespace std;
 
-static int s = 4;
+static int s;
 static matrix* A;
 static matrix* B;
 static matrix* C;
@@ -23,6 +24,10 @@ TileMulti::~TileMulti()
 void TileMulti::setup(matrix* matA, int height, int width) 
 {
 	A = matA;
+	// Needs to be 3 sub mats in cache at a time
+	int allowedSizeOfSubMat = (CACHE_SIZE_KB*1024) / 3;
+	int numOfSubMats = allowedSizeOfSubMat / sizeof(int);
+	s = ceil( sqrt(numOfSubMats) );
 }
 
 matrix * TileMulti::matrixMultiplication(matrix* matB)

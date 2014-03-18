@@ -31,22 +31,17 @@ void DFSBinarySearch::createDataStructure(int * arr, int arrSize)
 }
 
 void dfsInsert(int dfsIdx, int atDepth, int * inputArr) {
-	if (dfsIdx < dfsArrSize) {
+	if (dfsIdx < dfsArrSize && atDepth <= treeHeight) {
+		int offset = floor(pow(2, (treeHeight - atDepth)));
+		atDepth++;
 		
-		if (atDepth <= treeHeight) {	
-			int offset = floor(pow(2, (treeHeight - atDepth)));
-			atDepth++;
-			
-			// Go left;
-			dfsInsert(dfsIdx + 1, atDepth, inputArr);
-				
-			// Insert self	
-			dfsArr[dfsIdx] = inputArr[insertFrom];
-			insertFrom++;
-			
-			// Go right
-			dfsInsert(dfsIdx + offset, atDepth, inputArr);
-		 } 
+		// Go left;
+		dfsInsert(dfsIdx + 1, atDepth, inputArr);
+		// Insert self	
+		dfsArr[dfsIdx] = inputArr[insertFrom];
+		insertFrom++;
+		// Go right
+		dfsInsert(dfsIdx + offset, atDepth, inputArr);
 	}
 }
 
