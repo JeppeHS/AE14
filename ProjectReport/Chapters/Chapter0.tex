@@ -2,11 +2,9 @@
 
 \chapter{Methods} % Main chapter title
 
-\label{Chapter0} % Change X to a consecutive number; for referencing this
-chapter elsewhere, use \ref{ChapterX}
+\label{Chapter0} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{Chapter0}
 
-\lhead{Chapter 0. \emph{Methods}} % Change X to a consecutive number; this is
-for the header on each page - perhaps a shortened title
+\lhead{Chapter 0. \emph{Methods}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
 
 %-------------------------------------------------------------------------------
 %	SECTION 1
@@ -34,7 +32,14 @@ algorithms work.
 %-------------------------------------------------------------------------------
 \section{Testing}
 We are comparing the output of all implementations.
-
+ \begin{lstlisting}[numbers=left]
+ // Check result
+if (oldRes != -1 && oldRes != newRes) {
+	printf("Wrong result. prev:%s %d, new:%s %d, ArrSize %d, searchFor %d\n", algo_labels[iAlg-1], oldRes, algo_labels[iAlg], newRes, arrSize, searchFor); 
+ 					
+}
+oldRes = newRes;
+\end{lstlisting}
 Discuss other methods for testing/verifying...... Advantages/disadvantages....
 
 

@@ -25,18 +25,18 @@ Then for all the rows in the first matrix and all the colums in the second matri
 
 Then we save the value in the resulting matrix.
 After we have iterated trough all the columns and rows we return the resulting matrix.
-\lstinputlisting[language=C++, firstline=16, lastline=29, numbers=left]{./Figures/NaiveMatrixMulti.cpp}
+\lstinputlisting[language=C++, firstline=16, lastline=29, numbers=left]{./Figures/Project2a/NaiveMatrixMulti.cpp}
 
 \subsection{Transposed}
-\lstinputlisting[language=C++, firstline=5, lastline=6, numbers=left]{./Figures/Transpose.cpp}
+\lstinputlisting[language=C++, firstline=5, lastline=6, numbers=left]{./Figures/Project2a/Transpose.cpp}
 We start by transposing the input matrix in a transpose method that is called in the setup method.
-\lstinputlisting[language=C++, firstline=12, lastline=14, numbers=left]{./Figures/Transpose.cpp}
+\lstinputlisting[language=C++, firstline=12, lastline=14, numbers=left]{./Figures/Project2a/Transpose.cpp}
 The setup method should always be called before the matrix multiplication method is used.
-\lstinputlisting[language=C++, firstline=16, lastline=26, numbers=left]{./Figures/Transpose.cpp}
+\lstinputlisting[language=C++, firstline=16, lastline=26, numbers=left]{./Figures/Project2a/Transpose.cpp}
 After the transpose method has been called we start by creating a matrix p we use to save the result in.
 Then for all the colums in the transposed matrix mC, and all the colums in the second matrix B, we calculate the sum of the product between all the enties in the current column of mC and B.
 When we have iterated through all the colums in both matrixes and saved the results we are done.
-\lstinputlisting[language=C++, firstline=29, lastline=42, numbers=left]{./Figures/Transpose.cpp}
+\lstinputlisting[language=C++, firstline=29, lastline=42, numbers=left]{./Figures/Project2a/Transpose.cpp}
 
 
 \subsection{Recursive}
