@@ -9,10 +9,10 @@
 %----------------------------------------------------------------------------------------
 
 \section{Introduction}
-The following project experiments with different binary search algorithms. All our implementations takes a sorted static array of integers as input, search
-this using a changing query value and returns the value if found or the next highest value in the array if not found.
-The different implementations all have a setup method called createDataStructure and a search method called binSearch.
-We only measure the execution of the binSearch methods as our implementations assume a static input array.
+This project experiments with different binary search algorithms. All our implementations takes a sorted static array of integers as input, search
+this using a varying query value and returns the value if found or the next highest value in the array if not found.
+The different implementations all have a setup method called \verb!createDataStructure! and a search method called \verb!binSearch!.
+We only measure the execution of the \verb!binSearch! methods as our implementations assume a static input array.
 
 \section{Implementations}
 The following four implementations of the binary search algorithm used four different memory layouts. The tree structures are shown in figure \ref{fig:memory_layouts}.
@@ -97,10 +97,10 @@ The binary search is then implemented as follows:
 The implementation of depth first binary search (DFS) is based on \citep{binAlg}. 
 The basic idea is to make a depth first traversal of the binary tree to create a different memory layout. 
 
-The DFS implementation is build op like the other binary search implementations with a createDataStructure and a binSearch method. 
-The createDataStructure sets op the given sorted array in a DFS fashion and saves it in a new array, dfsArr. 
-The dfsArr is created through a recursive method called dfsInsert, that traverses the input array from left to right at insert in the dfsArr in a recursive manner. 
-The dfsInsert method simulate traversal of the DFS tree and at each iteration of the tree-depth the method inserts the current element from the input array and then calls dfsInsert on it's left and right children. 
+The DFS implementation is build op like the other binary search implementations with a \verb!createDataStructure! and a \verb!binSearch! method. 
+The \verb!createDataStructure! sets op the given sorted array in a DFS fashion and saves it in a new array, \verb!dfsArr!. 
+The \verb!dfsArr! is created through a recursive method called \verb!dfsInsert!, that traverses the input array from left to right at insert in the \verb!dfsArr! in a recursive manner. 
+The \verb!dfsInsert! method simulate traversal of the DFS tree and at each iteration of the tree-depth the method inserts the current element from the input array and then calls \verb!dfsInsert! on it's left and right children. 
 \begin{lstlisting}[numbers=left]
 void dfsInsert(int dfsIdx, int atDepth, int * inputArr) {
 	if (dfsIdx < dfsArrSize && atDepth <= treeHeight) {
@@ -119,15 +119,15 @@ void dfsInsert(int dfsIdx, int atDepth, int * inputArr) {
 	}
 } 
 \end{lstlisting}
-The left child is found by simply iterating one and the calculated offset is used to find the left child. 
-We observed that there is a relationship between two to the power of heght of the tree and the current tree depth and index of the right child, 
+The left child is found by simply iterating one and the calculated \verb!offset! is used to find the left child. 
+We observed that there is a relationship between two to the power of height of the tree and the current tree depth and index of the right child, 
 and use this in the calculation of the offset.   
 
-Making the actual binary search in the created DFS tree is done with the same way as in the other algorithms, but also keeping track of the our current depth.
+Making the actual binary search in the created DFS tree is done the same way as in the other algorithms, but also keeping track of the our current depth.
 The highest value seen so far (lower than what we are looking for) is maintained and then the array is traversed like a binary tree. 
-The main difference in DFS is what each time we need to visit the right child we calculate the offset in same way as in createDataStructue.  
-But here shifting bits instead of using pow to save computation time (It could also been done this way in createDataStructue, but we use pow to ease the understanding). 
-\begin{lstlisting}[numbers=left]
+The main difference in DFS is what each time we need to visit the right child we calculate the \verb!offset! in same way as in \verb!createDataStructure!.  
+But here shifting bits instead of using pow to save computation time (It could also been done this way in \verb!createDataStructure!, but we use \verb!pow! to ease the understanding). 
+\begin{lstlisting}
  ...
 // Go right
 node = node + (1<<(treeHeight-atDepth));

@@ -10,8 +10,21 @@
 
 
 \section{Introduction}
-
-
+In this project we have implemented different algorithms for matrix multiplication, to experiment with different ways of utilizing cache.
+For the implementations we created a matrix data type with the following methods:
+\begin{lstlisting}
+  ...
+  typedef struct {int nRows, nCols; int* data;} matrix;
+  matrix* createMatrix(int nRows, int nCols);
+  void destroyMatrix(matrix* m);
+  void matrixPut(matrix* m, int i, int j, int value);
+  void matrixAdd(matrix* m, int i, int j, int value);
+  int matrixGet(matrix* m, int i, int j);
+  void matrixPrint(matrix* m);
+  bool matrixEquals(matrix* m1, matrix* m2);
+  ...
+\end{lstlisting}
+The matrix is saved as a \verb!int[]! ..  and the the matrix entries is accessed like this \verb!int indx = j*(*m).nRows+i;!
 
 \section{Implementations}
 The implementations are based on \citep{matrixMultiplication}.
@@ -83,7 +96,7 @@ The approach is to multiply two matrices by dividing them into sub-matrices and 
 		\includegraphics[width=\textwidth]{./Figures/Project2a/TiledMulti_Pseudo.jpg}
 		\rule{35em}{0.5pt}
 	\caption[Pseudocode for tiled multiplication]{
-	Bla bla bla.
+	Pseudocode for tiled multiplication.
 	}
 	\label{fig:TiledMulti_Pseudo}
 \end{figure}
@@ -112,7 +125,7 @@ To keep track of how far we have gotten in each direction in A and B and how big
   int colsVisitedB = 0;
   ...
 \end{lstlisting}
-The size of the new sub-matrix (e.g. subAnRows) are updated each time we iterate in the corresponding direction (e.g. rows). 
+The size of the new sub-matrix (e.g. \verb!subAnRows!) are updated each time we iterate in the corresponding direction (e.g. rows). 
 The new value depends on how far we've gotten and the size of the input e.g.
 \begin{lstlisting}
 subAnRows = ceil( (double) (A->nRows - rowsVisitedA) / (double) (s - i) );
