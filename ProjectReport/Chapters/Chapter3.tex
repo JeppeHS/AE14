@@ -9,10 +9,6 @@
 %----------------------------------------------------------------------------------------
 
 
-\section{Introduction}
-
-
-
 \section{Implementations}
 
 
@@ -44,7 +40,7 @@ To have something to compare the Multi-core Radix Sort to, we implemented, among
 The idea is to sort the input array of keys into buckets starting from the lowest significant digit. After each sorting into buckets for a digit an array sorted from the that digit is produced. 
 This is done for each digit until the input array is fully sorted. 
 
-The implemtation uses C++ std:queue structure to simulate buckets. We assume that this data structure utilizes memory and computation quite effectively, and it seem logical to use this instead of creating our own bucket data structure.
+The implemtation uses C++ \verb!std:queue! structure to simulate buckets. We assume that this data structure utilizes memory and computation quite effectively, and it seem logical to use this instead of creating our own bucket data structure.
 In the method 'sort' the pgram sorts the array as mentioned before, by iterating over the digits starting from the lowest significant one. At each iteration sorting the keys into buckets and then creating a new array from these buckets.
 \begin{lstlisting}[numbers=left]
 ...
@@ -142,13 +138,13 @@ The implementation is based on the pseudocode from the forementioned article:
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2b/MultiCoreRadix_Pseudo.jpg}
 		\rule{35em}{0.5pt}
-	\caption[Branch misses]{
-	Bla bla bla.
+	\caption[Multicore radix pseudocode]{
+	Pseudocode for Multi-core Radix Sort
 	}
 	\label{fig:Branch_misses}
 \end{figure}
 As in the pseudocode the program starts out by sorting the array based on the most significant digit in parallel, then serial compute output indicies (PrefixSum in the pseudocode) and finally parallel sort each bucket based on LSD.  
-The parallel parts is implemented using POSIX threads (<pthread.h>), which by default utilizes multicore cpus by starting each thread on a new cpu.
+The parallel parts is implemented using POSIX threads (\verb!<pthread.h>!), which by default utilizes multicore cpus by starting each thread on a new cpu.
 
 The program has two 2D arrays which respectively holds buckets and bucket histograms for each thread. These are called threadBucketArrays and threadNextArrays.
 Each of the bucket arrays in threadBucketArrays inititally took up N x M space, where N is elements in the input array and M is number of buckets.
@@ -236,12 +232,12 @@ We now for a fact that the \verb!srand! methods does this, but what other functi
 		\includegraphics[width=\textwidth]{./Figures/Project2b/multicore_cpu_usage.png}
 		\rule{35em}{0.5pt}
 	\caption[Multicore CPU usage]{
-	Bla bla bla.
+	MCR threads running in serial.
 	}
 	\label{fig:multicore_cpu_usage}
 \end{figure}
 
-As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different cpus is stared, but these doesn't run in parallel.
+As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different cpus is started, but these doesn't run in parallel.
 
 \section{Results and discussion}
 
