@@ -124,16 +124,12 @@ The algorithm was straight forward to implement an contains no complex computati
 \subsection{MSD - using arrays (MSD\_arr)}
 
 
-\subsection{LSD - using arrays (LSD\_arr)}
-This version has not been implemented, but it could be done by making similar modifications to LSD as above.
-
-
 \subsection{Multicore radix sort (MCR)}
 The implementation of Multi-core Radix Sort (MCR) is based on the approach in \citep{radixSort}. The idea behind is to use the benefits of both MSD and LSD and making the algorithm parallel to decrease computation time. 
 The algorithm first partitions the input array into buckets with based on MSD and then sort each of theses buckets locally with using LSD.  
 MSD has the disavangtage of not being very effective on arrays of small size or values is close to each other, because it can results of a lot of empty buckets. 
-But has the advantage that when the values is sorted by one digit sorting by next digit only moves around the 
-LSD on the other hand ...
+But has the advantage that when values have the same digit these doesn't have to be moved around. LSD on the other hand will have to move values that share prefix around again and again.
+LSD has the advantage of handling non-uniform distribution of values better than MSD, but has the tradeoff of copying data around.  
 
 The implementation is based on the pseudocode from the forementioned article:
 \begin{figure}[htbp]
