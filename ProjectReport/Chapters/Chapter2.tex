@@ -76,6 +76,39 @@ void recMult(int i_A, int j_A, int i_B, int j_B, int m, int n, int p) {
 
 
 \subsection{Tiled}
+Idea:
+The implementation of tiled matrix multiplication (TMM) is based on \citep{matrixMultiplication}, where TMM is presented as an example of an cache-aware algorithm. 
+The approach is to multiply two matrices by dividing them into sub-matrices and multiplying these (see image). 
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project2a/TiledMulti_Pseudo.jpg}
+		\rule{35em}{0.5pt}
+	\caption[Branch misses]{
+	Bla bla bla.
+	}
+	\label{fig:Branch_misses}
+\end{figure}
+By doing this the idea is base the size of the sub-matrices on the cache size and thereby utilize the cache in the best way (i.e. fewer cache faults).   
+
+Implementation:
+TMM is implemented by splitting the input matrices (A and B) into S sub matrices in each dimension. Which in our case typically S = 4. 
+Then each sub-matrix is calculated with the naive matrix multiplication method. 
+The biggest challenge in the implemtation was to seperate the input matrices int sub-matrices without creating new matrices, which would use a lot of extra memory and computation time. 
+Instead we keep track of the start indices og the sub-matrices and just access the input matrices to get the values. 
+To keep track of how far we have gotten in each direction and in both A and B, and how big the next sub-matrices is, we keep updating six variables:
+\begin{verbatim}
+int subAnRows, subAnCols, subBnCols;
+	int rowsVisitedA = 0;
+	int colsVisitedA = 0;
+	int colsVisitedB = 0;
+\end{verbatim}
+The size of the new sub-matrix (e.g. subAnRows) are updated each time we iterate in the corresponding direction (e.g. rows). 
+The new value depends on how far we've gotten and the size of the input e.g.
+\begin{verbatim}
+subAnRows = ceil( (double) (A->nRows - rowsVisitedA) / (double) (s - i) );
+\end{verbatim}
+We only need three variables to maintain where we are in A and B and not four, because of the constraint that A has to have as many coloumns as B has rows for the two to be multiplied. 
+Maintaining these values also means that A and B can be multiplied without depending on that they are symmetric or have the same size, as long as they comply with forementioned constraint.
 
 
 

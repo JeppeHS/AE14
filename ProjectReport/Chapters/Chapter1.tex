@@ -101,6 +101,23 @@ The binary search is then implemented as follows:
 
 
 \subsection{Depth-first search (DFS)}
+Idea:
+Implementation of depth first binary search (DFS) is implemented from \citep{binAlg}. The idea is to make a depth first traversal of the binary'tree to create a different memory layout. 
+
+Implementation:
+The DFS implementation is build op like the other binary search implementations with a createDataStructure and a binSearch 
+method. The createDataStructure sets op the given sorted array in a DFS fashion and saves it in a new array, dfsArr. 
+The dfsArr is created through a recursive method called dfsInsert, that traverses the input array from left to right at insert in the dfsArr in a recursive manner. The dfsInsert method simulate traversal of the DFS tree and at each iteration of the tree-depth the method inserts the current element from the input array and then calls dfsInsert on it's left and right children. The hard thing in the implmentation is to calculate the index of the right child in the DFS tree. This offset depends on the tree height at the current depth, and is calculated like this:
+\begin{verbatim}
+int offset = floor(pow(2, (treeHeight - atDepth)));
+\end{verbatim}
+
+Making the actual binary search in the created DFS tree is done with the same way as in the other algorithms; keeping track of the our current depth and the highest value seen so far (lower than what we are looking for) then traversing the array like a binary tree. The main difference is what each time we need to visit the right chil: Here we calculate the offset in same way as in createDataStructue, but shifting instead of using pow to save computation time:
+\begin{verbatim}
+// Go right
+node = node + (1<<(treeHeight-atDepth));
+\end{verbatim}
+
 
 
 \subsection{Van Emde Boas (vEB)}

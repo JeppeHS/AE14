@@ -87,6 +87,13 @@ void msdRecursive(queue<int> bucket, int pass) {
 
 
 \subsection{Least significant digit (LSD)}
+Idea:
+To have something to compare the Multi-core Radix Sort to, we implemented, among others, Least Significant Digit (LSD) radix sort. 
+The idea is to sort the input array of keys into buckets sorting starting from the lowest significant digit the producing an array sorted from the current digit, continuing until the input array is sorted. 
+
+Implemtation:
+The implemtation uses C++ std:queue structure to simulate buckets. We assume that this data structure utilizes memory and computation quite effectively, and it seem logical to use this instead of creating our own bucket data structure.
+In the method 'sort' sort the array as mentioned before, by iterating over the digits starting from the lowest significant one. At each iteration sorting the keys into buckets and then creating a new array from these buckets.
 
 
 \subsection{MSD - using arrays (MSD\_arr)}
@@ -97,6 +104,27 @@ This version has not been implemented, but it could be done by making similar mo
 
 
 \subsection{Multicore radix sort (MCR) \citep{radixSort}}
+Idea:
+The implementation of Multi-core Radix Sort (MCR) is based on \citep{radixSort}. The idea behind is to use the benefits of both MSD and LSD and making the algorithm parallel to decrease computation time. 
+The algorithm first partitions into buckets with MSD and then sort each of theses buckets locally with LSD.  
+MSD has the disavangtage of not being very effective on arrays of small size, because it can results of a lot of empty buckets. But is good at...
+LSD on the other hand ...
+
+
+Implementation:
+The implementation is based on the pseudocode from the forementioned article:
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project2b/MultiCoreRadix_Pseudo.jpg}
+		\rule{35em}{0.5pt}
+	\caption[Branch misses]{
+	Bla bla bla.
+	}
+	\label{fig:Branch_misses}
+\end{figure}
+
+As in the pseudocode the algorithm start out by sorting the array based on the most significant digit in parallel, then serial compute output indicies (PrefixSum in pseudocode) and finally parallel sort each bucket based on LSD.  
+The parallel parts is implemented using Posix threads
 
 
 
