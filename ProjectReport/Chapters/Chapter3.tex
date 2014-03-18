@@ -1,35 +1,162 @@
 % Chapter 3
 
-\chapter{The name of chapter 3} % Main chapter title
+\chapter{Project 2b: Radix sort} % Main chapter title
 
 \label{Chapter3} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
-\lhead{Chapter 3. \emph{The name of chapter 3}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
+\lhead{Chapter 3. \emph{Radix sort}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
 
 %----------------------------------------------------------------------------------------
 
-\section{A headline}
+
+\section{Introduction}
 
 
 
-\subsection{A subsection headline}
+\section{Implementations}
 
-Awesome code:
+
+
+
+\subsection{Counting sort (CS)}
+
+
+\subsection{Most significant digit (MSD)}
+
+The MSD radix sort is implemented as follows:
 \begin{verbatim}
-#include <iostream>
-using namespace std;
-int main()
-{ 
-    cout << "Hello World!" << endl; 
-    return 0;
+  // Pass 0
+  queue<int> buckets[N_BUCKETS];
+  for (int i = 0; i < arrSize; i++) {
+    // Add to bucket
+    buckets[ sortedArray[i] >> (K-D) ].push(sortedArray[i]);
+  }
+  // Pass 1 (and the rest, recursively)
+  for (int b = 0; b < N_BUCKETS; b++) {
+    msdRecursive(buckets[b], 1);
+  }
+  return sortedArray;
+\end{verbatim}
+
+
+It makes use of the following recursive method:
+\begin{verbatim}
+void msdRecursive(queue<int> bucket, int pass) {
+  if (bucket.empty()) return;
+  
+  // Base case (this bucket is already fully sorted).
+  if (pass == N_PASSES) {
+    while(!bucket.empty()) {
+      sortedArray[sortArrIdx] = bucket.front();
+      bucket.pop();
+      sortArrIdx++;
+    }
+    return;
+  }
+  // Sort this bucket into some new buckets.
+  queue<int> buckets[N_BUCKETS];
+  while(!bucket.empty()) {
+    const int key = bucket.front();
+    bucket.pop();
+    // Add to bucket
+    buckets[ (key >> (K - (pass+1)*D)) & MASK_D ].push(key);
+  }
+    // Example (K=8, D=2, pass=1, so we have already sorted by AB, and now we look at CD):
+    // (ABCDEFGH >> (8 - (1+1)*2)) & 00000011
+    // (ABCDEFGH >> 4) & 00000011
+    //  0000ABCD & 00000011
+    //  000000CD
+
+  // Now, sort all buckets recursively.
+  for (int b = 0; b < N_BUCKETS; b++) {
+    msdRecursive(buckets[b], pass+1);
+  }
 }
 \end{verbatim}
 
 
-\begin{equation}
-a = \log \left( 1 + \sum_{k=1}^n \frac{b_k}{k} \right)
-\label{eq:thatEquation}
-\end{equation}
+
+\subsection{Least significant digit (LSD)}
 
 
-From (\ref{eq:thatEquation}) it is seen that...
+\subsection{MSD - using arrays (MSD\_arr)}
+
+
+\subsection{LSD - using arrays (LSD\_arr)}
+This version has not been implemented, but it could be done by making similar modifications to LSD as above.
+
+
+\subsection{Multicore radix sort (MCR) \citep{radixSort}}
+
+
+
+\section{Results and discussion}
+
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project2b/Branch_misses.pdf}
+		\rule{35em}{0.5pt}
+	\caption[Branch misses]{
+	Bla bla bla.
+	}
+	\label{fig:Branch_misses}
+\end{figure}
+
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project2b/Cache_misses.pdf}
+		\rule{35em}{0.5pt}
+	\caption[Cache misses]{
+	Bla bla bla.
+	}
+	\label{fig:Cache_misses}
+\end{figure}
+
+
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project2b/Cache_refs.pdf}
+		\rule{35em}{0.5pt}
+	\caption[Cache refs]{
+	Bla bla bla.
+	}
+	\label{fig:Cache_refs}
+\end{figure}
+
+
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project2b/Cpu_cycles.pdf}
+		\rule{35em}{0.5pt}
+	\caption[CPU cycles]{
+	Bla bla bla.
+	}
+	\label{fig:Cpu_cycles}
+\end{figure}
+
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project2b/Instructions.pdf}
+		\rule{35em}{0.5pt}
+	\caption[Instructions]{
+	Bla bla bla.
+	}
+	\label{fig:Instructions}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project2b/Page_faults.pdf}
+		\rule{35em}{0.5pt}
+	\caption[Page faults]{
+	Bla bla bla.
+	}
+	\label{fig:Page_faults}
+\end{figure}
+
+

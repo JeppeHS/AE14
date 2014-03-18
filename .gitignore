@@ -18,7 +18,15 @@
 geany_run_script.sh
 *.png
 
-Main
-*~
+# Latex stuff
+*.tex~
+*.bib~
 *#
+*.aux
+*.bbl
+*.blg
+*.lof
+*.log
+main.pdf
+*.toc
 
