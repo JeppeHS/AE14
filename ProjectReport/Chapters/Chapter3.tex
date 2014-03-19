@@ -12,6 +12,7 @@
 \section{Implementations}
 This project describes experiments done with different sorting algorithms for sorting arrays of int keys. The implementations centers around radix sort, but we also perform experiment with QuickSort and CountingSort to have something to compare with.
 All algorithms in this project is based on approaches in \citep{radixSort}.
+They all use $O(n)$, where $n$ is size of the input array.
 The implementations have two methods:
 \begin{lstlisting}
   void setup(int arrSize);
@@ -250,6 +251,10 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 
 \section{Results and discussion}
 
+As seen in figure \ref{fig:Branch_misses_p2b}, CS has the fewest branch misses, which at the same time is approximately constant. This is because of the predictive behavior of CS i.e. it has no conditionals.
+Both MCR and MSD\_arr follows the same overall course. The reason for this is that they both use the same data structure for storing their buckets which is one long array handled by paged virtual memory.
+On the other hand, MSD and LSD uses queues for buckets, which is handled in a different way.
+We have no control over the implementation of QS, so we cannot explain its behavior.
 
 \begin{figure}[htbp]
 	\centering
@@ -261,6 +266,11 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 	\label{fig:Branch_misses_p2b}
 \end{figure}
 
+
+In figure \ref{fig:Cache_misses_p2b} and \ref{fig:Cache_refs_p2b}, the MSDs are highest because they constantly access different buckets, which then have to be loaded into cache.
+Disregarding QS, MCR has the fewest cache refs and misses. Even though MCR is prevented from utilizing multiple CPUs in a parallel manner, each thread has its own L1 and L2 cache and they only need to consider a fraction of the input array.
+This utilizes the cache more efficiently.
+
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2b/Cache_misses.pdf}
@@ -270,9 +280,6 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 	}
 	\label{fig:Cache_misses_p2b}
 \end{figure}
-
-
-
 
 \begin{figure}[htbp]
 	\centering
@@ -286,6 +293,12 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 
 
 
+
+The figures \ref{fig:Cpu_cycles_p2b} and \ref{fig:Instructions_p2b} looks similar.
+The algorithm that using fewest instructions/cycles is MCR, which at first glance seems surprising for such a complex algorithm. However, if we consider the trick that avoids one of the four passes, this should give speedup factor of about $2^D$.
+The algorithm with the highest number of base instructions is MSD, which can be explained by the number of queues created in the recursive structure, which all need to be maintained. 
+
+
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2b/Cpu_cycles.pdf}
@@ -296,7 +309,6 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 	\label{fig:Cpu_cycles_p2b}
 \end{figure}
 
-
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2b/Instructions.pdf}
@@ -306,20 +318,13 @@ As seen in figure \ref{fig:multicore_cpu_usage}, different threads on different 
 	}
 	\label{fig:Instructions_p2b}
 \end{figure}
-The algorithm that using fewest instructions is MCR, which at first glance seems surprising for such a complex algorithm.
-MCR also has the lowest gradient where QS has the steepest, which maybe could be explained by the recursive manner of QuickSort.
-Logically the slope MCR should follow LSD and/or MSD, because MCR uses approach from both of them.
-A guess to the low number of instructions for MCR, could be that a lot of instructions can be optimized away.
-The algorithm with the highest number of base instructions is MSD, which can be explained by that a lot of queue is created in the recursive structure wchich all needs to be maintained. 
 
-\begin{figure}[htbp]
-	\centering
-		\includegraphics[width=\textwidth]{./Figures/Project2b/Page_faults.pdf}
-		\rule{35em}{0.5pt}
-	\caption[Page faults]{
-	Memory page faults for sorting algorithms based on array size.
-	}
-	\label{fig:Page_faults_p2b}
-\end{figure}
 
+
+\section{Conclusion}
+During the projects we have learned the significance of different cache usage techniques.
+In project one, the most surprising result is that vEB is competing with the other implementations on the execution time even though vEB uses far more instructions.
+
+In project three, MCR turned out to dominate the others, even though it didn't run in a parallel manner. 
+Another thing we didn't expect, was the advantage of using (uninitialized) arrays over queues as buckets.
 

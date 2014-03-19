@@ -12,7 +12,8 @@
 \section{Implementations}
 In this project we have implemented different algorithms for matrix multiplication, to experiment with different ways of utilizing cache.
 All implementations are based on \citep{matrixMultiplication}.
-For the implementations we created a matrix data type with the following methods:
+In theory they all use $O(m\cdot n\cdot p)$, where $m$ is the number of rows in the first matrix, $n$ is the number of columns in the first matrix as well as the number of rows in the second matrix, and $p$ is the number of columns in the second matrix.
+\\For the implementations we created a matrix data type with the following methods:
 \begin{lstlisting}
   ...
   typedef struct {int nRows, nCols; int* data;} matrix;
@@ -152,7 +153,6 @@ Maintaining these values also means that A and B can be multiplied without depen
 \section{Results and discussion}
 
 
-
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2a/Branch_misses.pdf}
@@ -162,7 +162,7 @@ Maintaining these values also means that A and B can be multiplied without depen
 	}
 	\label{fig:Branch_misses_p2a}
 \end{figure}
-We can see that the recursive function is above the others in branch miss predictions.
+We can see in figure \ref{fig:Branch_misses_p2a} that the recursive function is above the others in branch mispredictions.
 The reason is that for every calculation it has three choices.
 That makes the branch miss predictions $ \Theta ((m\cdot n\cdot p)\cdot \frac{2}{3}) $.
 
@@ -175,7 +175,7 @@ That makes the branch miss predictions $ \Theta ((m\cdot n\cdot p)\cdot \frac{2}
 	}
 	\label{fig:Cache_misses_p2a}
 \end{figure}
-This has a correlation with the graph for branch misses because if the recursive method has a lot og branch misses, then the system doesn't know what to load into the cache next time and thereby making a cache miss.
+Figure \ref{fig:Cache_misses_p2a} has a correlation with the graph for branch misses because if the recursive method has a lot of branch misses, then the system doesn't know what to load into the cache next time and thereby making a cache miss.
 
 
 \begin{figure}[htbp]
@@ -187,27 +187,30 @@ This has a correlation with the graph for branch misses because if the recursive
 	}
 	\label{fig:Cache_refs_p2a}
 \end{figure}
-The naive and tiled algorithms make equally many references to the cache.
-The Naive algorithm have to load a whole row for every calculation and the arrays are saved by columns which means it has to load the first element in every column.
-The tiled is a little better but is still using a naive matrix multiplication after splitting the input matrix into smaller sub matrices.
+In figure \ref{fig:Cache_refs_p2a}, it is seen that the naive and tiled algorithms make equally many references to the cache.
+The Naive algorithm has to load a whole row for every calculation and the arrays are saved by columns which means it has to load the first element in every column.
+The tiled is a little better but is still using a naive matrix multiplication after splitting the input matrix into smaller sub-matrices.
 
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2a/Cpu_cycles.pdf}
 		\rule{35em}{0.5pt}
 	\caption[CPU cycles]{
-	
+	This shows the relation between array size and CPU cycles.
 	}
 	\label{fig:Cpu_cycles_p2a}
 \end{figure}
 
+It is seen the relationship between the implementations are the same in figure \ref{fig:Cpu_cycles_p2a} and \ref{fig:Instructions_p2a}.
+The Naive, Transposed, and Tiled are almost identical, contrary to our expectations based the cache graphs.
+Presumably, the advantages of cache utilization are too small to dominate the running time.
 
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project2a/Instructions.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Instructions]{
-	Bla bla bla.
+	This shows the relation between array size and the number of instructions.
 	}
 	\label{fig:Instructions_p2a}
 \end{figure}

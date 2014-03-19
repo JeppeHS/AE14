@@ -18,6 +18,7 @@ We only measure the execution of the \verb!binSearch! methods as our implementat
   int binSearch(int elem);
 \end{lstlisting}
 
+A binary search algorithm runs in $O(\log(n))$, where $n$ is the array size.
 The following four implementations of the binary search algorithm used four different memory layouts. The tree structures are shown in figure \ref{fig:memory_layouts}.
 
 \begin{figure}[htbp]
@@ -234,7 +235,7 @@ The binary search is implemented as follows:
 Looking at the branch misses in figure \ref{fig:Branch_misses_p1}, we see that three of the implementations have almost the same number of branch misses as a function of array size.
 This follows intuitively from the fact that the trees are balanced and thus have the same height, and the number of branches are proportional to the height.
 The vEB implementation, however, has a constant number of branch misses, no matter the size of the array. This is not caused by the unbalanced tree structure, since an even higher tree should produce at least as many branch misses.
-Instead, it is caused by the specific way that the child index is calculated. Refering back to vEB binary search, when the comparison in line \ref{lst:goRight} is used directly in the index calculation, the compiler uses a conditional move operation, thus eliminating the actual branch.
+Instead, it is caused by the specific way that the child index is calculated. Refering back to vEB binary search, when the comparison in line \ref{lst:veb_goRight} is used directly in the index calculation, the compiler uses a conditional move operation, thus eliminating the actual branch.
 
 \begin{figure}[htbp]
 	\centering
@@ -247,7 +248,13 @@ Instead, it is caused by the specific way that the child index is calculated. Re
 \end{figure}
 
 
-In figure \ref{fig:Cache_misses_p1}, the number of cache misses are shown. Here, the implementation 
+In figure \ref{fig:Cache_misses_p1}, the number of cache misses are shown. Inorder has the most cache refs and misses. This can be explained from the fact that searching the inorder array, jumps both forward and backwards.
+In the other three layout, jumps only happen in the forward direction. 
+Below an array size of about 64000 there are no cache refs or misses. The cache statistics indicates the use of the last level cache (L3).
+The L3 cache is only used when the L2 cache is full. The test system has an L2 cache size of 256 kB, which corresponds to 64000 integers.
+BFS has less cache refs and misses than DFS because finding the right child in DFS requires a significant jump forward.
+vEB is designed to utilize the cache in the best possible way. When loading the value of a child chances are that the cached data contains some of the grandchildren.
+So it is no surprise that it has the lowest cache misses and refs.
 
 \begin{figure}[htbp]
 	\centering
@@ -269,26 +276,30 @@ In figure \ref{fig:Cache_misses_p1}, the number of cache misses are shown. Here,
 	\label{fig:Cache_refs_p1}
 \end{figure}
 
-
-
-\begin{figure}[htbp]
-	\centering
-		\includegraphics[width=\textwidth]{./Figures/Project1/Cpu_cycles.pdf}
-		\rule{35em}{0.5pt}
-	\caption[CPU cycles]{
-	Bla bla bla.
-	}
-	\label{fig:Cpu_cycles_p1}
-\end{figure}
-
+In figure \ref{fig:Instructions_p1} we see a peculiar behavior of the vEB. The overall course of the graph can be explained from the complex structure of the vEB which often generates very unbalanced trees.
 
 \begin{figure}[htbp]
 	\centering
 		\includegraphics[width=\textwidth]{./Figures/Project1/Instructions.pdf}
 		\rule{35em}{0.5pt}
 	\caption[Instructions]{
-	Bla bla bla.
+	The number of hardware instructions plotted against array size.
 	}
 	\label{fig:Instructions_p1}
+\end{figure}
+
+
+The relationship between Inorder, BFS, and DFS corresponds nicely to the cache graphs. vEB, however, starts out being slower but catches up later on, for very large array sizes.
+Looking at the cache graphs, we expected that the vEB was faster. The large amount of instructions could explain why it is slower than the others.
+The spike at around 100000 can probably be attributed to some other processes taking up CPU time. This spike was not present in other runs.
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=\textwidth]{./Figures/Project1/Cpu_cycles.pdf}
+		\rule{35em}{0.5pt}
+	\caption[CPU cycles]{
+	The number of CPU cycles plotted against array size.
+	}
+	\label{fig:Cpu_cycles_p1}
 \end{figure}
 

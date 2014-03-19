@@ -4,18 +4,30 @@
 
 \label{Chapter0} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{Chapter0}
 
-\lhead{Chapter 0. \emph{Methods}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
+\lhead{Chapter \ref{Chapter0}. \emph{Methods}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
+
+%-------------------------------------------------------------------------------
+%	SECTION 0
+%-------------------------------------------------------------------------------
+\section{Introduction}
+This report consists of three projects which implements different variations of the same algorithms, each experimenting with cache utilization and general optimization techniques.
+These are evaluated by running experiments with varying input sizes and values.
+The main method running the experiments, consists of an outer loop where the input size is varied, as well as an inner loop where runs of the same input size is repeated for different values.
+We measure execution statistics for each run and save the averages to some csv-files. 
+We generate random input values using the \verb!srand()! method.
+
 
 %-------------------------------------------------------------------------------
 %	SECTION 1
 %-------------------------------------------------------------------------------
-\section{Language}
-All of the implementations are written in c++. Execution is carried out on a
+\section{Language and environment}
+All of the implementations are written in C++. Execution is carried out on a
 Linux machine. Linux is necessary for utilizing perf\_event\_open, see section
 \ref{section:perf_stat}.
+The experiments presented in chapter \ref{Chapter1} to \ref{Chapter3} is performed on a laptop with Intel i7 quad core, 2.7 GHz CPUs, 4 GB ram. The CPU has an L1 cache size of 32 kB, L2 cache size of 256 kB, and an L3 cache size of 4096 kB. 
+In the appendix, we include runs carried out on Llama01 with Intel Xeon quad core, 2.4 GHz CPUs, 8 GB ram, L1=32 kB, L2=256 kB, L3=8192 kB.
 
-Compiling is done using the gnu compiler with the command ``g++ -std=c++0x
--O3''.
+Compiling is done using the gnu compiler with the command \verb!g++ -std=c++0x -O3!.
 The first option is included to be able to use certain code constructions.
 The second option is included to make the compiler optimize the code as much as
 possible.
@@ -25,13 +37,11 @@ Thus, we should be able to identify differences in executions based on how the
 algorithms work.
 
 
-
-
 %-------------------------------------------------------------------------------
 %	SECTION 2
 %-------------------------------------------------------------------------------
 \section{Testing}
-We are comparing the output of all implementations.
+To test the correctness of our algorithms, we compare the output of all implementations e.g.:
  \begin{lstlisting}[numbers=left]
  // Check result
 if (oldRes != -1 && oldRes != newRes) {
@@ -40,8 +50,9 @@ if (oldRes != -1 && oldRes != newRes) {
 }
 oldRes = newRes;
 \end{lstlisting}
-Discuss other methods for testing/verifying...... Advantages/disadvantages....
-
+There are other possible ways of testing or verifying the correctness, e.g. using assertions, formal proofs, or a checker program.
+Because we have access to at least for implementations in each project, we can be almost certain of the correctness if the outputs are identical.
+Furthermore, we run the experiments on a lot of different input values and sizes.
 
 %-------------------------------------------------------------------------------
 %	SECTION 3
@@ -66,7 +77,6 @@ interrupting the thread we are interested in.
  
  \item Instructions: The number of low-level instructions used to execute the
 code.
- \item Page faults: The number of times the system tries to access a page in the paged virtual memory which is not loaded in physical memory.
 \end{itemize}
 
 
