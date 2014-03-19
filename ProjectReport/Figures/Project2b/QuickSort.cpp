@@ -12,11 +12,11 @@ void QuickSort::setup(int arrSize){}
 
 int compare (const void * a, const void * b)
 {
-	return ( *(int*)a - *(int*)b );
+  return ( *(int*)a - *(int*)b );
 }
 
 int* QuickSort::sort(int* array, int arrSize)
 {
-	std::qsort(array, arrSize, sizeof(int), compare);
-	return array;
+  std::qsort(array, arrSize, sizeof(int), compare);
+  return array;
 }

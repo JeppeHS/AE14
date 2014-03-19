@@ -235,7 +235,7 @@ The implementation could be made generic, taking an abitrary K and D, but we did
 A generic solution could be achieved simply by adding LSD sorting in between the first LSD sorting and the second to last LSD sorting.
 
 It turns out that the parallel parts of this implementation in fact doesn't run in parallel. This is with high probability because some methods locks the program to make serial computation.
-We now for a fact that the \verb!srand! methods does this, but what other functionality in the implementation has this effect.   
+We now for a fact that the \verb!srand! methods does this, but what other functionality in the implementation has this effect, we don't know.
 
 \begin{figure}[htbp]
 	\centering
