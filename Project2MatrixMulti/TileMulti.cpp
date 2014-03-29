@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "TileMulti.h"
 
-#define CACHE_SIZE_KB 512 
+#define CACHE_SIZE_KB 1
 using namespace std;
 
 static int s;
@@ -26,8 +26,15 @@ void TileMulti::setup(matrix* matA, int height, int width)
 	A = matA;
 	// Needs to be 3 sub mats in cache at a time
 	int allowedSizeOfSubMat = (CACHE_SIZE_KB*1024) / 3;
-	int numOfSubMats = allowedSizeOfSubMat / sizeof(int);
-	s = ceil( sqrt(numOfSubMats) );
+	int elemsInSubMat = allowedSizeOfSubMat / sizeof(int);
+
+	if ((height*width) > elemsInSubMat) {
+		int numOfSubMats = (height*width) / elemsInSubMat;
+		s = ceil( sqrt(numOfSubMats) );
+	} else {
+		s = 1;
+	}
+	
 }
 
 matrix * TileMulti::matrixMultiplication(matrix* matB)
@@ -40,7 +47,7 @@ matrix * TileMulti::matrixMultiplication(matrix* matB)
 	// Debug
 	//printf("Initialized output matrix with %d rows and %d cols\n", C->nRows, C->nCols);
 
-	if (A->nRows < s || B->nCols < s) { s = 1; }	// If can't split matrix 
+	if (A->nRows < s || A->nCols < s || B->nCols < s) { s = 1; }	// If can't split matrix 
 
 	// Algorithm
 	int subAnRows, subAnCols, subBnCols;
